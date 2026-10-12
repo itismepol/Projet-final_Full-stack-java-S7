@@ -1,4 +1,4 @@
-package altn72.tpfilrouge.service;
+package altn72.prj.service;
 
 import altn72.tpfilrouge.modele.Programmeur;
 import altn72.tpfilrouge.modele.ProgrammeurRepository;
@@ -7,7 +7,6 @@ import altn72.tpfilrouge.modele.ProgrammeurRepository;
 // et il offre plus d'options (readOnly, rollbackFor, propagation...).
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

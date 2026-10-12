@@ -1,4 +1,4 @@
-package altn72.tpfilrouge;
+package altn72.prj;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
