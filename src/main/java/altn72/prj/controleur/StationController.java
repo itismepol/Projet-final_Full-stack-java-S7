@@ -30,7 +30,7 @@ public class StationController {
     }
 
     @GetMapping("/{idStation}/equipements")
-    public ResponseEntity<List<Equipement>> afficherEquipements(@PathVariable Long idStation){
+    public ResponseEntity<List<Equipement>> afficherEquipementsStation(@PathVariable Long idStation){
         List<Equipement> equipements = consultationEquipementService.listerEquipementsStation(idStation);
         return equipements.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(equipements);
 

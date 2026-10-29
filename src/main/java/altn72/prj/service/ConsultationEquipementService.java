@@ -1,9 +1,11 @@
 package altn72.prj.service;
 
 import altn72.prj.modele.Equipement;
-import altn72.prj.modele.Exception.StationIntrouvableException;
+import altn72.prj.modele.Incident;
 import altn72.prj.modele.Station;
+import altn72.prj.modele.error.EquipementNotFoundException;
 import altn72.prj.modele.repository.EquipementRepository;
+import altn72.prj.modele.repository.IncidentRepository;
 import altn72.prj.modele.repository.StationRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -18,10 +20,12 @@ public class ConsultationEquipementService {
 
     private final EquipementRepository equipementRepository;
     private final StationRepository stationRepository;
+    private final IncidentRepository incidentRepository;
 
-    public ConsultationEquipementService(EquipementRepository equipementRepository, StationRepository stationRepository){
+    public ConsultationEquipementService(EquipementRepository equipementRepository, StationRepository stationRepository, IncidentRepository incidentRepository) {
         this.equipementRepository = equipementRepository;
         this.stationRepository = stationRepository;
+        this.incidentRepository = incidentRepository;
     }
 
     public Optional<Station> consulterStation(Long idStation) {
@@ -39,13 +43,18 @@ public class ConsultationEquipementService {
     public List<Station> getStations() {
         return stationRepository.findAll();
     }
+
     public List<Equipement> getEquipements() {
         return equipementRepository.findAll();
     }
 
     public List<Equipement> listerEquipementsStation(Long idStation) {
-        consulterStation(idStation);
         return equipementRepository.findByStationIdOrderByLibelle(idStation);
+    }
+
+    public EquipementEtIncidents getEquipementEtIncidents(Long idEquipement) {
+        Equipement equipement = getEquipement(idEquipement).orElseThrow(() -> new EquipementNotFoundException(idEquipement));
+        return new EquipementEtIncidents(equipement, incidentRepository.findByEquipement(idEquipement));
     }
 
     @Transactional
@@ -86,6 +95,10 @@ public class ConsultationEquipementService {
             BeanUtils.copyProperties(equipementModifie, equipementToModify, "id");
             return equipementToModify;
         });
+
+
     }
+
+    public record EquipementEtIncidents(Equipement equipement, List<Incident> incidents) {}
 
 }

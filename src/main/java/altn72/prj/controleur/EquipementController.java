@@ -1,6 +1,5 @@
 package altn72.prj.controleur;
 
-import altn72.prj.modele.Equipement;
 import altn72.prj.service.ConsultationEquipementService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +18,8 @@ public class EquipementController {
     }
 
     @GetMapping("{idEquipement}")
-    public ResponseEntity<Equipement> getEquipement(@PathVariable("idEquipement") Long idEquipement) {
-
+    public ResponseEntity<ConsultationEquipementService.EquipementEtIncidents> getEquipementEtIncidents(@PathVariable("idEquipement") Long idEquipement) {
+        return ResponseEntity.ok(consultationEquipementService.getEquipementEtIncidents(idEquipement));
     }
+
 }
