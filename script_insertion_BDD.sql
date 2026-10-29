@@ -43,16 +43,16 @@ INSERT INTO prestataire (nom, email, telephone, specialite) VALUES
 -- Hash bcrypt de la chaîne "password" : UNIQUEMENT pour les tests.
 -- En production, le hash est généré par l'application (bcrypt / argon2).
 INSERT INTO utilisateur (login, mot_de_passe, prenom, nom, email, profil) VALUES
-('admin',    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Alice',  'Martin',  'alice.martin@example.com', 'ADMIN'),
-('resp.expl','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Bruno',  'Durand',  'bruno.durand@example.com', 'RESPONSABLE_EXPLOITATION'),
-('tech1',    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Camille','Leroy',   'camille.leroy@example.com','TECHNICIEN'),
-('lecteur1', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'David',  'Moreau',  NULL,                       'LECTEUR');
+('admin1',    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Alice',  'Martin',  'alice.martin@example.com', 'ADMIN'),
+('resp.expl1','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Bruno',  'Durand',  'bruno.durand@example.com', 'RESPONSABLE_EXPLOITATION'),
+('resp.expl2',    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Camille','Leroy',   'camille.leroy@example.com','RESPONSABLE_EXPLOITATION'),
+('admin2', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'David',  'Moreau',  NULL,                       'ADMIN');
 
 -- Incidents
 -- Ouverts / en cours (date_resolution NULL)
 INSERT INTO incident (equipement_id, titre, description, priorite, statut, date_ouverture, prestataire_id, date_affectation, date_resolution, declare_par) VALUES
 (1,  'Ascenseur bloqué',        'Ascenseur quai A bloqué entre deux niveaux.',        'CRITIQUE', 'EN_COURS', NOW() - INTERVAL 2 DAY,   1, NOW() - INTERVAL 46 HOUR, NULL, 3),
-(4,  'Distributeur lent',       'Le distributeur n''imprime plus les tickets.',       'NORMALE',  'AFFECTE',  NOW() - INTERVAL 1 DAY,   3, NOW() - INTERVAL 20 HOUR, NULL, 3),
+(4,  'Distributeur lent',       'Le distributeur n''imprime plus les tickets.',       'NORMALE',  'AFFECTE',  NOW() - INTERVAL 47 HOUR, 3, NOW() - INTERVAL 20 HOUR, NULL, 3),
 (11, 'Écran éteint',            'Écran du hall central totalement éteint.',           'HAUTE',    'OUVERT',   NOW() - INTERVAL 6 HOUR,  NULL, NULL,                  NULL, 2),
 (7,  'Bruit anormal escalator', 'Bruit métallique au démarrage de l''escalator.',     'NORMALE',  'EN_COURS', NOW() - INTERVAL 3 DAY,   1, NOW() - INTERVAL 70 HOUR, NULL, 3);
 

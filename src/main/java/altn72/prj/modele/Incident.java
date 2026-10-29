@@ -31,10 +31,9 @@ public class Incident {
     @Column(name = "priorite", nullable = false)
     private String priorite;
 
-    @ColumnDefault("'OUVERT'")
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "statut", nullable = false)
-    private String statut;
+    private IncidentStatut statut = IncidentStatut.OUVERT;
 
     @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "date_ouverture", nullable = false)
@@ -50,10 +49,6 @@ public class Incident {
 
     @Column(name = "date_resolution")
     private Instant dateResolution;
-
-    @Lob
-    @Column(name = "commentaire_resolution")
-    private String commentaireResolution;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
@@ -100,11 +95,11 @@ public class Incident {
         this.priorite = priorite;
     }
 
-    public String getStatut() {
+    public Enum<IncidentStatut> getStatut() {
         return statut;
     }
 
-    public void setStatut(String statut) {
+    public void setStatut(IncidentStatut statut) {
         this.statut = statut;
     }
 
@@ -138,14 +133,6 @@ public class Incident {
 
     public void setDateResolution(Instant dateResolution) {
         this.dateResolution = dateResolution;
-    }
-
-    public String getCommentaireResolution() {
-        return commentaireResolution;
-    }
-
-    public void setCommentaireResolution(String commentaireResolution) {
-        this.commentaireResolution = commentaireResolution;
     }
 
     public Utilisateur getDeclarePar() {

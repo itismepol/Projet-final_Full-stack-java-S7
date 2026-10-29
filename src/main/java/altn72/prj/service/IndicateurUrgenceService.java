@@ -1,43 +1,25 @@
 package altn72.prj.service;
 
-import altn72.tpfilrouge.modele.Programmeur;
-import altn72.tpfilrouge.modele.ProgrammeurRepository;
-// import jakarta.transaction.Transactional;
-// 4.6.2 -- On utilise le @Transactional de Spring (et non celui de Jakarta) : c'est celui que Spring gère nativement,
-// et il offre plus d'options (readOnly, rollbackFor, propagation...).
-import org.springframework.transaction.annotation.Transactional;
+import altn72.prj.modele.Equipement;
+import altn72.prj.modele.repository.EquipementRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
-// Cette classe est dans le package "service" (et non plus dans "controleur")
 @Service
-public class ProgrammeurService {
+public class IndicateurUrgenceService {
 
-//    @Autowired
-//    private ProgrammeurRepository programmeurRepository;
+    private final EquipementRepository equipementRepository;
 
-    // Injection de dépendance via le constructeur -- DÉBUT //
-    private final ProgrammeurRepository programmeurRepository;
-    public ProgrammeurService(ProgrammeurRepository programmeurRepository){ this.programmeurRepository = programmeurRepository;}
-    // Injection de dépendance via le constructeur -- FIN //
-
-    public List<Programmeur> getProgrammeurs() {
-        return programmeurRepository.findAll();
+    public IndicateurUrgenceService(EquipementRepository equipementRepository) {
+        this.equipementRepository = equipementRepository;
     }
 
-    public Optional<Programmeur> getUnProgrammeur(Integer idProgrammeur) {
-        Optional<Programmeur> unProgrammeur = programmeurRepository.findById(idProgrammeur);
+    public Optional<Equipement> getEquipement(Long idProgrammeur) {
 
-        // Ancienne version : on lançait une exception si l'id n'existait pas
-        // Une exception non gérée devient une réponse HTTP 500 (erreur SERVEUR), alors que l'erreur vient ici du CLIENT (id inexistant)
-        // De plus Optional.of(x.orElseThrow()) était redondant : l'Optional n'apportait plus rien
-        // Le service renvoie donc l'Optional tel quel : c'est le contrôleur qui choisit le code HTTP (200 ou 404)
-        // 5.12 -- Cette méthode alimente aussi la page de modification (detailsProgrammeur) : si l'Optional est vide, le contrôleur renvoie un 404.
-        if (unProgrammeur.isEmpty()) System.out.println("Ce programmeur n'existe pas");
-        return unProgrammeur;
+        return equipementRepository.findById(idProgrammeur);
     }
 
     // @Transactional ici aussi : on enchaîne 2 opérations (vérifier l'existence, puis supprimer) qui forment un tout
@@ -85,3 +67,4 @@ public class ProgrammeurService {
         });
     }
 }
+

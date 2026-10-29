@@ -6,26 +6,12 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>4.1.1</version>
-        <relativePath/>
     </parent>
     <groupId>altn72</groupId>
-    <artifactId>TpFilRouge</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>TpFilRouge</name>
-    <description>TpFilRouge</description>
-    <url/>
-    <licenses>
-        <license/>
-    </licenses>
-    <developers>
-        <developer/>
-    </developers>
-    <scm>
-        <connection/>
-        <developerConnection/>
-        <tag/>
-        <url/>
-    </scm>
+    <artifactId>ProjetFinal</artifactId>
+    <version>1.0</version>
+    <name>ProjetFinalApplication</name>
+
     <properties>
         <java.version>27</java.version>
     </properties>

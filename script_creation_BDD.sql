@@ -95,13 +95,12 @@ CREATE TABLE incident (
     description        TEXT NOT NULL,
     priorite           ENUM('BASSE','NORMALE','HAUTE','CRITIQUE')
                        NOT NULL DEFAULT 'NORMALE',                -- ajout
-    statut             ENUM('OUVERT','AFFECTE','EN_COURS','RESOLU','CLOTURE')
+    statut             ENUM('OUVERT','AFFECTE','RESOLU')
                        NOT NULL DEFAULT 'OUVERT',
     date_ouverture     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     prestataire_id     INT UNSIGNED NULL,
     date_affectation   DATETIME NULL,                             -- ajout
     date_resolution    DATETIME NULL,
-    commentaire_resolution TEXT NULL,                             -- ajout
     declare_par        INT UNSIGNED NULL,                         -- ajout : utilisateur déclarant
     CONSTRAINT fk_incident_equipement  FOREIGN KEY (equipement_id)
         REFERENCES equipement(id)  ON UPDATE CASCADE ON DELETE RESTRICT,
@@ -114,8 +113,8 @@ CREATE TABLE incident (
         CHECK (date_resolution IS NULL OR date_resolution >= date_ouverture),
     -- cohérence statut / date de résolution
     CONSTRAINT ck_incident_resolution
-        CHECK ( (statut IN ('RESOLU','CLOTURE') AND date_resolution IS NOT NULL)
-             OR (statut IN ('OUVERT','AFFECTE','EN_COURS') AND date_resolution IS NULL) ),
+        CHECK ( (statut IN ('RESOLU') AND date_resolution IS NOT NULL)
+             OR (statut IN ('OUVERT','AFFECTE') AND date_resolution IS NULL) ),
     INDEX idx_incident_equipement  (equipement_id),
     INDEX idx_incident_prestataire (prestataire_id),
     INDEX idx_incident_statut      (statut),
