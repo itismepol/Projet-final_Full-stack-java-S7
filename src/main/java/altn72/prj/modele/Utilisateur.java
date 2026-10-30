@@ -28,10 +28,9 @@ public class Utilisateur {
     @Column(name = "email", length = 150)
     private String email;
 
-    @ColumnDefault("'LECTEUR'")
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "profil", nullable = false)
-    private String profil;
+    private TypeProfil profil;
 
     @ColumnDefault("1")
     @Column(name = "actif", nullable = false)
@@ -92,15 +91,15 @@ public class Utilisateur {
         this.email = email;
     }
 
-    public String getProfil() {
+    public TypeProfil getProfil() {
         return profil;
     }
 
-    public void setProfil(String profil) {
+    public void setProfil(TypeProfil profil) {
         this.profil = profil;
     }
 
-    public Boolean getActif() {
+    public Boolean isActif() {
         return actif;
     }
 
