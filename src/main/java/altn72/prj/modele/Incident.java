@@ -26,10 +26,9 @@ public class Incident {
     @Column(name = "description", nullable = false)
     private String description;
 
-    @ColumnDefault("'NORMALE'")
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "priorite", nullable = false)
-    private String priorite;
+    private NiveauUrgence priorite = NiveauUrgence.VERT;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "statut", nullable = false)
@@ -49,6 +48,10 @@ public class Incident {
 
     @Column(name = "date_resolution")
     private Instant dateResolution;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "evaluation_id")
+    private Evaluation evaluation;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
@@ -87,11 +90,11 @@ public class Incident {
         this.description = description;
     }
 
-    public String getPriorite() {
+    public NiveauUrgence getPriorite() {
         return priorite;
     }
 
-    public void setPriorite(String priorite) {
+    public void setPriorite(NiveauUrgence priorite) {
         this.priorite = priorite;
     }
 
@@ -143,4 +146,11 @@ public class Incident {
         this.declarePar = declarePar;
     }
 
+    public Evaluation getEvaluation() {
+        return evaluation;
+    }
+
+    public void setEvaluation(Evaluation evaluation) {
+        this.evaluation = evaluation;
+    }
 }

@@ -85,6 +85,22 @@ CREATE TABLE utilisateur (
     CONSTRAINT uq_utilisateur_login UNIQUE (login)
 ) ENGINE=InnoDB;
 
+
+-- ---------------------------------------------------------------------
+-- ÉVALUATION
+-- ---------------------------------------------------------------------
+
+CREATE TABLE evaluation (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    note            TINYINT UNSIGNED NOT NULL,
+    commentaire     TEXT NULL,
+    date_evaluation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    evalue_par      INT UNSIGNED NULL,
+    CONSTRAINT ck_evaluation_note CHECK (note BETWEEN 1 AND 5),
+    CONSTRAINT fk_evaluation_user FOREIGN KEY (evalue_par)
+        REFERENCES utilisateur(id) ON UPDATE CASCADE ON DELETE SET NULL
+) ENGINE=InnoDB;
+
 -- ---------------------------------------------------------------------
 -- INCIDENT
 -- ---------------------------------------------------------------------
@@ -101,6 +117,8 @@ CREATE TABLE incident (
     prestataire_id     INT UNSIGNED NULL,
     date_affectation   DATETIME NULL,                             -- ajout
     date_resolution    DATETIME NULL,
+     commentaire_resolution TEXT NULL, 
+    evaluation_id      INT UNSIGNED NULL,
     declare_par        INT UNSIGNED NULL,                         -- ajout : utilisateur déclarant
     CONSTRAINT fk_incident_equipement  FOREIGN KEY (equipement_id)
         REFERENCES equipement(id)  ON UPDATE CASCADE ON DELETE RESTRICT,
@@ -115,28 +133,16 @@ CREATE TABLE incident (
     CONSTRAINT ck_incident_resolution
         CHECK ( (statut IN ('RESOLU') AND date_resolution IS NOT NULL)
              OR (statut IN ('OUVERT','AFFECTE') AND date_resolution IS NULL) ),
+	CONSTRAINT uq_incident_evaluation UNIQUE (evaluation_id),
+    CONSTRAINT fk_incident_evaluation FOREIGN KEY (evaluation_id)
+        REFERENCES evaluation(id),
+    -- une évaluation n'existe que sur un incident résolu
+    CONSTRAINT ck_incident_evaluation
+        CHECK (evaluation_id IS NULL OR statut IN ('RESOLU','CLOTURE')),
     INDEX idx_incident_equipement  (equipement_id),
     INDEX idx_incident_prestataire (prestataire_id),
     INDEX idx_incident_statut      (statut),
     INDEX idx_incident_ouverture   (date_ouverture)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- ÉVALUATION (une seule évaluation par incident)
--- ---------------------------------------------------------------------
-CREATE TABLE evaluation (
-    id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    incident_id    INT UNSIGNED NOT NULL,
-    note           TINYINT UNSIGNED NOT NULL,
-    commentaire    TEXT NULL,
-    date_evaluation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    evalue_par     INT UNSIGNED NULL,                             -- ajout
-    CONSTRAINT uq_evaluation_incident UNIQUE (incident_id),
-    CONSTRAINT ck_evaluation_note CHECK (note BETWEEN 1 AND 5),
-    CONSTRAINT fk_evaluation_incident FOREIGN KEY (incident_id)
-        REFERENCES incident(id)    ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT fk_evaluation_user     FOREIGN KEY (evalue_par)
-        REFERENCES utilisateur(id) ON UPDATE CASCADE ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -168,4 +174,4 @@ JOIN equipement e       ON e.id = i.equipement_id
 JOIN type_equipement te ON te.id = e.type_id
 JOIN station s          ON s.id = e.station_id
 LEFT JOIN prestataire p ON p.id = i.prestataire_id
-LEFT JOIN evaluation ev ON ev.incident_id = i.id;
+LEFT JOIN evaluation ev ON ev.id = i.evaluation_id;

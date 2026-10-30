@@ -15,11 +15,6 @@ public class Evaluation {
     @Column(name = "id", columnDefinition = "int UNSIGNED not null")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "incident_id", nullable = false)
-    private Incident incident;
-
     @Column(name = "note", columnDefinition = "tinyint UNSIGNED not null")
     private Short note;
 
@@ -42,14 +37,6 @@ public class Evaluation {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Incident getIncident() {
-        return incident;
-    }
-
-    public void setIncident(Incident incident) {
-        this.incident = incident;
     }
 
     public Short getNote() {

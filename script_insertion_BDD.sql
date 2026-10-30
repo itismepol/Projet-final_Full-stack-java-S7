@@ -48,28 +48,28 @@ INSERT INTO utilisateur (login, mot_de_passe, prenom, nom, email, profil) VALUES
 ('resp.expl2',    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Camille','Leroy',   'camille.leroy@example.com','RESPONSABLE_EXPLOITATION'),
 ('admin2', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'David',  'Moreau',  NULL,                       'ADMIN');
 
+-- Évaluations (ids 1 à 6, rattachées ensuite aux incidents résolus)
+INSERT INTO evaluation (note, commentaire, date_evaluation, evalue_par) VALUES
+(5, 'Intervention rapide et efficace.',          NOW() - INTERVAL 18 DAY, 2),
+(3, 'Résolu, mais délai un peu long.',           NOW() - INTERVAL 13 DAY, 2),
+(4, NULL,                                        NOW() - INTERVAL 26 DAY, 2),
+(4, 'Bonne réactivité.',                         NOW() - INTERVAL 3 DAY,  2),
+(2, 'Panne revenue deux fois, travail bâclé.',   NOW() - INTERVAL 38 DAY, 2),
+(5, NULL,                                        NOW() - INTERVAL 23 DAY, 2);
+
 -- Incidents
 -- Ouverts / en cours (date_resolution NULL)
-INSERT INTO incident (equipement_id, titre, description, priorite, statut, date_ouverture, prestataire_id, date_affectation, date_resolution, declare_par) VALUES
-(1,  'Ascenseur bloqué',        'Ascenseur quai A bloqué entre deux niveaux.',        'CRITIQUE', 'EN_COURS', NOW() - INTERVAL 2 DAY,   1, NOW() - INTERVAL 46 HOUR, NULL, 3),
-(4,  'Distributeur lent',       'Le distributeur n''imprime plus les tickets.',       'NORMALE',  'AFFECTE',  NOW() - INTERVAL 47 HOUR, 3, NOW() - INTERVAL 20 HOUR, NULL, 3),
-(11, 'Écran éteint',            'Écran du hall central totalement éteint.',           'HAUTE',    'OUVERT',   NOW() - INTERVAL 6 HOUR,  NULL, NULL,                  NULL, 2),
-(7,  'Bruit anormal escalator', 'Bruit métallique au démarrage de l''escalator.',     'NORMALE',  'EN_COURS', NOW() - INTERVAL 3 DAY,   1, NOW() - INTERVAL 70 HOUR, NULL, 3);
+INSERT INTO incident (equipement_id, titre, description, priorite, statut, date_ouverture, prestataire_id, date_affectation, commentaire_resolution, date_resolution, declare_par) VALUES
+(1,  'Ascenseur bloqué',        'Ascenseur quai A bloqué entre deux niveaux.',        'CRITIQUE', 'AFFECTE', NOW() - INTERVAL 2 DAY,   1, NOW() - INTERVAL 46 HOUR, NULL, NULL, 3),
+(4,  'Distributeur lent',       'Le distributeur n''imprime plus les tickets.',       'NORMALE',  'AFFECTE',  NOW() - INTERVAL 47 HOUR, 3, NOW() - INTERVAL 20 HOUR, NULL, NULL, 3),
+(11, 'Écran éteint',            'Écran du hall central totalement éteint.',           'HAUTE',    'OUVERT',   NOW() - INTERVAL 6 HOUR,  NULL, NULL, NULL, NULL, 2),
+(7,  'Bruit anormal escalator', 'Bruit métallique au démarrage de l''escalator.',     'NORMALE',  'OUVERT', NOW() - INTERVAL 3 DAY,   1, NOW() - INTERVAL 70 HOUR,NULL, NULL, 3);
 
--- Résolus / clôturés
+-- Résolus
 INSERT INTO incident (equipement_id, titre, description, priorite, statut, date_ouverture, prestataire_id, date_affectation, date_resolution, commentaire_resolution, declare_par) VALUES
-(3,  'Portique ne s''ouvre plus', 'Le portique reste fermé après validation.',       'HAUTE',    'CLOTURE', NOW() - INTERVAL 20 DAY, 2, NOW() - INTERVAL 20 DAY + INTERVAL 1 HOUR, NOW() - INTERVAL 19 DAY, 'Remplacement du capteur.', 3),
-(5,  'Porte ascenseur',           'La porte ne se referme pas.',                      'NORMALE',  'CLOTURE', NOW() - INTERVAL 15 DAY, 1, NOW() - INTERVAL 15 DAY + INTERVAL 2 HOUR, NOW() - INTERVAL 14 DAY, 'Réglage de la porte.',      2),
-(8,  'Écran tactile HS',          'Écran tactile du distributeur non réactif.',       'BASSE',    'CLOTURE', NOW() - INTERVAL 30 DAY, 3, NOW() - INTERVAL 30 DAY + INTERVAL 3 HOUR, NOW() - INTERVAL 27 DAY, 'Remplacement de la dalle.',  3),
-(6,  'Affichage erroné',          'Horaires affichés incorrects.',                    'BASSE',    'RESOLU',  NOW() - INTERVAL 5 DAY,  4, NOW() - INTERVAL 5 DAY + INTERVAL 1 HOUR,  NOW() - INTERVAL 4 DAY,  'Mise à jour du logiciel.',   2),
-(9,  'Portique en alarme',        'Alarme sonore intempestive.',                      'NORMALE',  'CLOTURE', NOW() - INTERVAL 40 DAY, 2, NOW() - INTERVAL 40 DAY + INTERVAL 1 HOUR, NOW() - INTERVAL 39 DAY, 'Recalibrage du capteur.',   3),
-(2,  'Escalator à l''arrêt',      'Arrêt d''urgence déclenché.',                      'HAUTE',    'CLOTURE', NOW() - INTERVAL 25 DAY, 5, NOW() - INTERVAL 25 DAY + INTERVAL 2 HOUR, NOW() - INTERVAL 24 DAY, 'Remise en route après contrôle.', 2);
-
--- Évaluations (uniquement sur incidents résolus/clôturés)
-INSERT INTO evaluation (incident_id, note, commentaire, date_evaluation, evalue_par) VALUES
-(5,  5, 'Intervention rapide et efficace.',          NOW() - INTERVAL 18 DAY, 2),
-(6,  3, 'Résolu, mais délai un peu long.',           NOW() - INTERVAL 13 DAY, 2),
-(7,  4, NULL,                                        NOW() - INTERVAL 26 DAY, 2),
-(8,  4, 'Bonne réactivité.',                         NOW() - INTERVAL 3 DAY,  2),
-(9,  2, 'Panne revenue deux fois, travail bâclé.',   NOW() - INTERVAL 38 DAY, 2),
-(10, 5, NULL,                                        NOW() - INTERVAL 23 DAY, 2);
+(3, 'Portique ne s''ouvre plus', 'Le portique reste fermé après validation.', 'HAUTE',   'RESOLU', NOW() - INTERVAL 20 DAY, 2, NOW() - INTERVAL 20 DAY + INTERVAL 1 HOUR, NOW() - INTERVAL 19 DAY, 'Remplacement du capteur.', 3),
+(5, 'Porte ascenseur',           'La porte ne se referme pas.',                'NORMALE', 'RESOLU', NOW() - INTERVAL 15 DAY, 1, NOW() - INTERVAL 15 DAY + INTERVAL 2 HOUR, NOW() - INTERVAL 14 DAY, 'Réglage de la porte.',      2),
+(8, 'Écran tactile HS',          'Écran tactile du distributeur non réactif.', 'BASSE',   'RESOLU', NOW() - INTERVAL 30 DAY, 3, NOW() - INTERVAL 30 DAY + INTERVAL 3 HOUR, NOW() - INTERVAL 27 DAY, 'Remplacement de la dalle.',  3),
+(6, 'Affichage erroné',          'Horaires affichés incorrects.',              'BASSE',   'RESOLU',  NOW() - INTERVAL 5 DAY,  4, NOW() - INTERVAL 5 DAY + INTERVAL 1 HOUR,  NOW() - INTERVAL 4 DAY,  'Mise à jour du logiciel.',   2),
+(9, 'Portique en alarme',        'Alarme sonore intempestive.',                'NORMALE', 'RESOLU', NOW() - INTERVAL 40 DAY, 2, NOW() - INTERVAL 40 DAY + INTERVAL 1 HOUR, NOW() - INTERVAL 39 DAY, 'Recalibrage du capteur.',   3),
+(2, 'Escalator à l''arrêt',      'Arrêt d''urgence déclenché.',                'HAUTE',   'RESOLU', NOW() - INTERVAL 25 DAY, 5, NOW() - INTERVAL 25 DAY + INTERVAL 2 HOUR, NOW() - INTERVAL 24 DAY, 'Remise en route après contrôle.', 2);
