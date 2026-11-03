@@ -1,9 +1,7 @@
 package altn72.prj.modele;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.ColumnDefault;
 
-import java.time.Instant;
 import java.time.LocalDate;
 
 @Entity
@@ -12,7 +10,7 @@ public class Equipement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", columnDefinition = "int UNSIGNED not null")
-    private Long id;
+    private Integer id;
 
     @Column(name = "reference", nullable = false, length = 50)
     private String reference;
@@ -20,8 +18,7 @@ public class Equipement {
     @Column(name = "libelle", nullable = false, length = 150)
     private String libelle;
 
-    @Lob
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -32,23 +29,18 @@ public class Equipement {
     @JoinColumn(name = "station_id", nullable = false)
     private Station station;
 
-    @ColumnDefault("'EN_SERVICE'")
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "etat", nullable = false)
-    private String etat;
+    private EtatEquipement etat = EtatEquipement.EN_SERVICE;
 
     @Column(name = "date_mise_service")
     private LocalDate dateMiseService;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "date_creation", nullable = false)
-    private Instant dateCreation;
-
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -92,11 +84,11 @@ public class Equipement {
         this.station = station;
     }
 
-    public String getEtat() {
+    public EtatEquipement getEtat() {
         return etat;
     }
 
-    public void setEtat(String etat) {
+    public void setEtat(EtatEquipement etat) {
         this.etat = etat;
     }
 
@@ -106,14 +98,6 @@ public class Equipement {
 
     public void setDateMiseService(LocalDate dateMiseService) {
         this.dateMiseService = dateMiseService;
-    }
-
-    public Instant getDateCreation() {
-        return dateCreation;
-    }
-
-    public void setDateCreation(Instant dateCreation) {
-        this.dateCreation = dateCreation;
     }
 
 }

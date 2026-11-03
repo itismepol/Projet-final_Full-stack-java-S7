@@ -1,11 +1,10 @@
 package altn72.prj.modele;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "incident")
@@ -13,7 +12,7 @@ public class Incident {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", columnDefinition = "int UNSIGNED not null")
-    private Long id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "equipement_id", nullable = false)
@@ -22,21 +21,19 @@ public class Incident {
     @Column(name = "titre", length = 150)
     private String titre;
 
-    @Lob
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = false, columnDefinition = "TEXT")
     private String description;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "priorite", nullable = false)
-    private NiveauUrgence priorite = NiveauUrgence.VERT;
+    private IncidentPriorite priorite = IncidentPriorite.NORMALE;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "statut", nullable = false)
     private IncidentStatut statut = IncidentStatut.OUVERT;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "date_ouverture", nullable = false)
-    private Instant dateOuverture;
+    private LocalDateTime dateOuverture;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
@@ -44,25 +41,27 @@ public class Incident {
     private Prestataire prestataire;
 
     @Column(name = "date_affectation")
-    private Instant dateAffectation;
+    private LocalDateTime dateAffectation;
 
     @Column(name = "date_resolution")
-    private Instant dateResolution;
+    private LocalDateTime dateResolution;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "evaluation_id")
+    @OneToOne(mappedBy = "incident", fetch = FetchType.LAZY)
     private Evaluation evaluation;
+
+    @Column(name = "commentaire_resolution", columnDefinition = "TEXT")
+    private String commentaireResolution;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "declare_par")
     private Utilisateur declarePar;
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -90,15 +89,15 @@ public class Incident {
         this.description = description;
     }
 
-    public NiveauUrgence getPriorite() {
+    public IncidentPriorite getPriorite() {
         return priorite;
     }
 
-    public void setPriorite(NiveauUrgence priorite) {
+    public void setPriorite(IncidentPriorite priorite) {
         this.priorite = priorite;
     }
 
-    public Enum<IncidentStatut> getStatut() {
+    public IncidentStatut getStatut() {
         return statut;
     }
 
@@ -106,11 +105,11 @@ public class Incident {
         this.statut = statut;
     }
 
-    public Instant getDateOuverture() {
+    public LocalDateTime getDateOuverture() {
         return dateOuverture;
     }
 
-    public void setDateOuverture(Instant dateOuverture) {
+    public void setDateOuverture(LocalDateTime dateOuverture) {
         this.dateOuverture = dateOuverture;
     }
 
@@ -122,19 +121,19 @@ public class Incident {
         this.prestataire = prestataire;
     }
 
-    public Instant getDateAffectation() {
+    public LocalDateTime getDateAffectation() {
         return dateAffectation;
     }
 
-    public void setDateAffectation(Instant dateAffectation) {
+    public void setDateAffectation(LocalDateTime dateAffectation) {
         this.dateAffectation = dateAffectation;
     }
 
-    public Instant getDateResolution() {
+    public LocalDateTime getDateResolution() {
         return dateResolution;
     }
 
-    public void setDateResolution(Instant dateResolution) {
+    public void setDateResolution(LocalDateTime dateResolution) {
         this.dateResolution = dateResolution;
     }
 
@@ -152,5 +151,13 @@ public class Incident {
 
     public void setEvaluation(Evaluation evaluation) {
         this.evaluation = evaluation;
+    }
+
+    public String getCommentaireResolution() {
+        return commentaireResolution;
+    }
+
+    public void setCommentaireResolution(String commentaireResolution) {
+        this.commentaireResolution = commentaireResolution;
     }
 }

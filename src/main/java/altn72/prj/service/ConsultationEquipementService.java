@@ -3,10 +3,10 @@ package altn72.prj.service;
 import altn72.prj.modele.Equipement;
 import altn72.prj.modele.Incident;
 import altn72.prj.modele.Station;
-import altn72.prj.modele.error.EquipementNotFoundException;
-import altn72.prj.modele.repository.EquipementRepository;
-import altn72.prj.modele.repository.IncidentRepository;
-import altn72.prj.modele.repository.StationRepository;
+import altn72.prj.exception.EquipementNotFoundException;
+import altn72.prj.repository.EquipementRepository;
+import altn72.prj.repository.IncidentRepository;
+import altn72.prj.repository.StationRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +28,7 @@ public class ConsultationEquipementService {
         this.incidentRepository = incidentRepository;
     }
 
-    public Optional<Station> consulterStation(Long idStation) {
+    public Optional<Station> consulterStation(Integer idStation) {
         return stationRepository.findById(idStation);
     }
 
@@ -36,7 +36,7 @@ public class ConsultationEquipementService {
         return stationRepository.findAllByOrderByNom();
     }
 
-    public Optional<Equipement> getEquipement(Long idEquipement) {
+    public Optional<Equipement> getEquipement(Integer idEquipement) {
         return equipementRepository.findById(idEquipement);
     }
 
@@ -48,17 +48,17 @@ public class ConsultationEquipementService {
         return equipementRepository.findAll();
     }
 
-    public List<Equipement> listerEquipementsStation(Long idStation) {
+    public List<Equipement> listerEquipementsStation(Integer idStation) {
         return equipementRepository.findByStationIdOrderByLibelle(idStation);
     }
 
-    public EquipementEtIncidents getEquipementEtIncidents(Long idEquipement) {
+    public EquipementEtIncidents getEquipementEtIncidents(Integer idEquipement) {
         Equipement equipement = getEquipement(idEquipement).orElseThrow(() -> new EquipementNotFoundException(idEquipement));
         return new EquipementEtIncidents(equipement, incidentRepository.findByEquipement(idEquipement));
     }
 
     @Transactional
-    public boolean supprimerStation(Long idStation) {
+    public boolean supprimerStation(Integer idStation) {
         if (!stationRepository.existsById(idStation)) return false;
         stationRepository.deleteById(idStation);
         return true;
@@ -70,7 +70,7 @@ public class ConsultationEquipementService {
     }
 
     @Transactional
-    public Optional<Station> modifierStation(Long idStation, Station stationModifie) {
+    public Optional<Station> modifierStation(Integer idStation, Station stationModifie) {
         return stationRepository.findById(idStation).map(stationToModify -> {
             BeanUtils.copyProperties(stationModifie, stationToModify, "id");
             return stationToModify;
@@ -78,7 +78,7 @@ public class ConsultationEquipementService {
     }
 
     @Transactional
-    public boolean supprimerEquipement(Long idEquipement) {
+    public boolean supprimerEquipement(Integer idEquipement) {
         if (!stationRepository.existsById(idEquipement)) return false;
         stationRepository.deleteById(idEquipement);
         return true;
@@ -90,7 +90,7 @@ public class ConsultationEquipementService {
     }
 
     @Transactional
-    public Optional<Equipement> modifierStation(Long idEquipement, Equipement equipementModifie) {
+    public Optional<Equipement> modifierStation(Integer idEquipement, Equipement equipementModifie) {
         return equipementRepository.findById(idEquipement).map(equipementToModify -> {
             BeanUtils.copyProperties(equipementModifie, equipementToModify, "id");
             return equipementToModify;

@@ -18,7 +18,7 @@ public class EquipementController {
     }
 
     @GetMapping("{idEquipement}")
-    public ResponseEntity<ConsultationEquipementService.EquipementEtIncidents> getEquipementEtIncidents(@PathVariable("idEquipement") Long idEquipement) {
+    public ResponseEntity<ConsultationEquipementService.EquipementEtIncidents> getEquipementEtIncidents(@PathVariable("idEquipement") Integer idEquipement) {
         return ResponseEntity.ok(consultationEquipementService.getEquipementEtIncidents(idEquipement));
     }
 

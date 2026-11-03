@@ -1,5 +1,7 @@
-package altn72.prj.modele;
+package altn72.prj.connexion;
 
+import altn72.prj.modele.TypeProfil;
+import altn72.prj.modele.Utilisateur;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
@@ -14,11 +16,14 @@ public class UtilisateurConnecte extends User {
         super(utilisateur.getLogin(),
                 utilisateur.getMotDePasse(),
                 utilisateur.isActif(), true, true, true,
-                List.of(new SimpleGrantedAuthority("ROLE_" + utilisateur.getProfil())));
+                List.of(new SimpleGrantedAuthority("ROLE_" + utilisateur.getProfil().name())));
         this.prenom = utilisateur.getPrenom();
         this.profil = utilisateur.getProfil();
     }
 
     public String getPrenom() { return prenom; }
 
+    public TypeProfil getProfil() { return profil; }
+
+    public String getLibelleProfil() { return profil.getLibelle(); }
 }

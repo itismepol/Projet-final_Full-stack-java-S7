@@ -3,7 +3,7 @@ package altn72.prj.modele;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "utilisateur")
@@ -11,7 +11,7 @@ public class Utilisateur {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", columnDefinition = "int UNSIGNED not null")
-    private Long id;
+    private Integer id;
 
     @Column(name = "login", nullable = false, length = 50)
     private String login;
@@ -32,22 +32,27 @@ public class Utilisateur {
     @Column(name = "profil", nullable = false)
     private TypeProfil profil;
 
-    @ColumnDefault("1")
     @Column(name = "actif", nullable = false)
-    private Boolean actif;
+    private Boolean actif = true;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "date_creation", nullable = false)
-    private Instant dateCreation;
+    private LocalDateTime dateCreation;
 
     @Column(name = "derniere_connexion")
-    private Instant derniereConnexion;
+    private LocalDateTime derniereConnexion;
 
-    public Long getId() {
+    @PrePersist
+    public void prePersist() {
+        if (dateCreation == null) {
+            dateCreation = LocalDateTime.now();
+        }
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -107,19 +112,19 @@ public class Utilisateur {
         this.actif = actif;
     }
 
-    public Instant getDateCreation() {
+    public LocalDateTime getDateCreation() {
         return dateCreation;
     }
 
-    public void setDateCreation(Instant dateCreation) {
+    public void setDateCreation(LocalDateTime dateCreation) {
         this.dateCreation = dateCreation;
     }
 
-    public Instant getDerniereConnexion() {
+    public LocalDateTime getDerniereConnexion() {
         return derniereConnexion;
     }
 
-    public void setDerniereConnexion(Instant derniereConnexion) {
+    public void setDerniereConnexion(LocalDateTime derniereConnexion) {
         this.derniereConnexion = derniereConnexion;
     }
 

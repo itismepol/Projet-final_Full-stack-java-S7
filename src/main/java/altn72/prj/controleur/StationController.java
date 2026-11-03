@@ -23,14 +23,14 @@ public class StationController {
     }
 
     @GetMapping("{idStation}")
-    public ResponseEntity<Station> afficherUneStation(@PathVariable("idStation") Long idStation) {
+    public ResponseEntity<Station> afficherUneStation(@PathVariable("idStation") Integer idStation) {
         return consultationEquipementService.consulterStation(idStation)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{idStation}/equipements")
-    public ResponseEntity<List<Equipement>> afficherEquipementsStation(@PathVariable Long idStation){
+    public ResponseEntity<List<Equipement>> afficherEquipementsStation(@PathVariable Integer idStation){
         List<Equipement> equipements = consultationEquipementService.listerEquipementsStation(idStation);
         return equipements.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(equipements);
 

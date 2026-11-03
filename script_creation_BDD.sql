@@ -27,30 +27,6 @@ CREATE TABLE type_equipement (
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- ÉQUIPEMENT
--- ---------------------------------------------------------------------
-CREATE TABLE equipement (
-    id                INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    reference         VARCHAR(50)  NOT NULL,
-    libelle           VARCHAR(150) NOT NULL,
-    description       TEXT NULL,
-    type_id           INT UNSIGNED NOT NULL,
-    station_id        INT UNSIGNED NOT NULL,
-    etat              ENUM('EN_SERVICE','DEGRADE','EN_MAINTENANCE','HORS_SERVICE')
-                      NOT NULL DEFAULT 'EN_SERVICE',
-    date_mise_service DATE NULL,                                  -- ajout
-    date_creation     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uq_equipement_reference UNIQUE (reference),
-    CONSTRAINT fk_equipement_type    FOREIGN KEY (type_id)
-        REFERENCES type_equipement(id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    CONSTRAINT fk_equipement_station FOREIGN KEY (station_id)
-        REFERENCES station(id)         ON UPDATE CASCADE ON DELETE RESTRICT,
-    INDEX idx_equipement_station (station_id),
-    INDEX idx_equipement_type    (type_id),
-    INDEX idx_equipement_etat    (etat)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
 -- PRESTATAIRE
 -- ---------------------------------------------------------------------
 CREATE TABLE prestataire (
@@ -77,28 +53,36 @@ CREATE TABLE utilisateur (
     prenom        VARCHAR(80)  NOT NULL,
     nom           VARCHAR(80)  NULL,                              -- ajout
     email         VARCHAR(150) NULL,                              -- ajout
-    profil        ENUM('ADMIN','RESPONSABLE_EXPLOITATION','TECHNICIEN','LECTEUR')
-                  NOT NULL DEFAULT 'LECTEUR',
+    profil        ENUM('RESPONSABLE_EXPLOITATION','AGENT')
+                  NOT NULL DEFAULT 'AGENT',
     actif         BOOLEAN NOT NULL DEFAULT TRUE,                  -- ajout
     date_creation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     derniere_connexion DATETIME NULL,                             -- ajout
     CONSTRAINT uq_utilisateur_login UNIQUE (login)
 ) ENGINE=InnoDB;
 
-
 -- ---------------------------------------------------------------------
--- ÉVALUATION
+-- ÉQUIPEMENT
 -- ---------------------------------------------------------------------
-
-CREATE TABLE evaluation (
-    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    note            TINYINT UNSIGNED NOT NULL,
-    commentaire     TEXT NULL,
-    date_evaluation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    evalue_par      INT UNSIGNED NULL,
-    CONSTRAINT ck_evaluation_note CHECK (note BETWEEN 1 AND 5),
-    CONSTRAINT fk_evaluation_user FOREIGN KEY (evalue_par)
-        REFERENCES utilisateur(id) ON UPDATE CASCADE ON DELETE SET NULL
+CREATE TABLE equipement (
+    id                INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    reference         VARCHAR(50)  NOT NULL,
+    libelle           VARCHAR(150) NOT NULL,
+    description       TEXT NULL,
+    type_id           INT UNSIGNED NOT NULL,
+    station_id        INT UNSIGNED NOT NULL,
+    etat              ENUM('EN_SERVICE','DEGRADE','EN_MAINTENANCE','HORS_SERVICE')
+                      NOT NULL DEFAULT 'EN_SERVICE',
+    date_mise_service DATE NULL,                                  -- ajout
+    date_creation     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_equipement_reference UNIQUE (reference),
+    CONSTRAINT fk_equipement_type    FOREIGN KEY (type_id)
+        REFERENCES type_equipement(id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT fk_equipement_station FOREIGN KEY (station_id)
+        REFERENCES station(id)         ON UPDATE CASCADE ON DELETE RESTRICT,
+    INDEX idx_equipement_station (station_id),
+    INDEX idx_equipement_type    (type_id),
+    INDEX idx_equipement_etat    (etat)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -117,8 +101,7 @@ CREATE TABLE incident (
     prestataire_id     INT UNSIGNED NULL,
     date_affectation   DATETIME NULL,                             -- ajout
     date_resolution    DATETIME NULL,
-     commentaire_resolution TEXT NULL, 
-    evaluation_id      INT UNSIGNED NULL,
+     commentaire_resolution TEXT NULL,
     declare_par        INT UNSIGNED NULL,                         -- ajout : utilisateur déclarant
     CONSTRAINT fk_incident_equipement  FOREIGN KEY (equipement_id)
         REFERENCES equipement(id)  ON UPDATE CASCADE ON DELETE RESTRICT,
@@ -133,16 +116,41 @@ CREATE TABLE incident (
     CONSTRAINT ck_incident_resolution
         CHECK ( (statut IN ('RESOLU') AND date_resolution IS NOT NULL)
              OR (statut IN ('OUVERT','AFFECTE') AND date_resolution IS NULL) ),
-	CONSTRAINT uq_incident_evaluation UNIQUE (evaluation_id),
-    CONSTRAINT fk_incident_evaluation FOREIGN KEY (evaluation_id)
-        REFERENCES evaluation(id),
-    -- une évaluation n'existe que sur un incident résolu
-    CONSTRAINT ck_incident_evaluation
-        CHECK (evaluation_id IS NULL OR statut IN ('RESOLU','CLOTURE')),
     INDEX idx_incident_equipement  (equipement_id),
     INDEX idx_incident_prestataire (prestataire_id),
     INDEX idx_incident_statut      (statut),
     INDEX idx_incident_ouverture   (date_ouverture)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- ÉVALUATION
+-- ---------------------------------------------------------------------
+
+CREATE TABLE evaluation (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    incident_id     INT UNSIGNED NOT NULL,
+    note            INT UNSIGNED NOT NULL,
+    commentaire     TEXT NULL,
+    date_evaluation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    evalue_par      INT UNSIGNED NULL,
+
+    CONSTRAINT ck_evaluation_note
+        CHECK (note BETWEEN 1 AND 5),
+
+    CONSTRAINT uq_evaluation_incident
+        UNIQUE (incident_id),
+
+    CONSTRAINT fk_evaluation_incident
+        FOREIGN KEY (incident_id)
+        REFERENCES incident(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_evaluation_user
+        FOREIGN KEY (evalue_par)
+        REFERENCES utilisateur(id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -157,9 +165,12 @@ SELECT
     i.statut,
     i.date_ouverture,
     i.date_resolution,
-    TIMESTAMPDIFF(MINUTE, i.date_ouverture,
-                  COALESCE(i.date_resolution, NOW()))  AS duree_minutes,
-    (i.date_resolution IS NULL)                        AS est_ouvert,
+    TIMESTAMPDIFF(
+        MINUTE,
+        i.date_ouverture,
+        COALESCE(i.date_resolution, NOW())
+    ) AS duree_minutes,
+    (i.date_resolution IS NULL) AS est_ouvert,
     e.id        AS equipement_id,
     e.reference AS equipement_reference,
     e.libelle   AS equipement_libelle,
@@ -168,10 +179,12 @@ SELECT
     s.nom       AS station_nom,
     p.id        AS prestataire_id,
     p.nom       AS prestataire_nom,
-    ev.note     AS note_evaluation
+    ev.id       AS evaluation_id,
+    ev.note     AS note_evaluation,
+    ev.commentaire AS commentaire_evaluation
 FROM incident i
-JOIN equipement e       ON e.id = i.equipement_id
+JOIN equipement e ON e.id = i.equipement_id
 JOIN type_equipement te ON te.id = e.type_id
-JOIN station s          ON s.id = e.station_id
+JOIN station s ON s.id = e.station_id
 LEFT JOIN prestataire p ON p.id = i.prestataire_id
-LEFT JOIN evaluation ev ON ev.id = i.evaluation_id;
+LEFT JOIN evaluation ev ON ev.incident_id = i.id;

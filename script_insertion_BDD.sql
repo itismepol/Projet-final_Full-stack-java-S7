@@ -43,19 +43,10 @@ INSERT INTO prestataire (nom, email, telephone, specialite) VALUES
 -- Hash bcrypt de la chaîne "password" : UNIQUEMENT pour les tests.
 -- En production, le hash est généré par l'application (bcrypt / argon2).
 INSERT INTO utilisateur (login, mot_de_passe, prenom, nom, email, profil) VALUES
-('admin1',    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Alice',  'Martin',  'alice.martin@example.com', 'ADMIN'),
+('agent1',    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Alice',  'Martin',  'alice.martin@example.com', 'AGENT'),
 ('resp.expl1','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Bruno',  'Durand',  'bruno.durand@example.com', 'RESPONSABLE_EXPLOITATION'),
 ('resp.expl2',    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Camille','Leroy',   'camille.leroy@example.com','RESPONSABLE_EXPLOITATION'),
-('admin2', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'David',  'Moreau',  NULL,                       'ADMIN');
-
--- Évaluations (ids 1 à 6, rattachées ensuite aux incidents résolus)
-INSERT INTO evaluation (note, commentaire, date_evaluation, evalue_par) VALUES
-(5, 'Intervention rapide et efficace.',          NOW() - INTERVAL 18 DAY, 2),
-(3, 'Résolu, mais délai un peu long.',           NOW() - INTERVAL 13 DAY, 2),
-(4, NULL,                                        NOW() - INTERVAL 26 DAY, 2),
-(4, 'Bonne réactivité.',                         NOW() - INTERVAL 3 DAY,  2),
-(2, 'Panne revenue deux fois, travail bâclé.',   NOW() - INTERVAL 38 DAY, 2),
-(5, NULL,                                        NOW() - INTERVAL 23 DAY, 2);
+('agent2', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'David',  'Moreau',  NULL,                       'AGENT');
 
 -- Incidents
 -- Ouverts / en cours (date_resolution NULL)
@@ -63,7 +54,7 @@ INSERT INTO incident (equipement_id, titre, description, priorite, statut, date_
 (1,  'Ascenseur bloqué',        'Ascenseur quai A bloqué entre deux niveaux.',        'CRITIQUE', 'AFFECTE', NOW() - INTERVAL 2 DAY,   1, NOW() - INTERVAL 46 HOUR, NULL, NULL, 3),
 (4,  'Distributeur lent',       'Le distributeur n''imprime plus les tickets.',       'NORMALE',  'AFFECTE',  NOW() - INTERVAL 47 HOUR, 3, NOW() - INTERVAL 20 HOUR, NULL, NULL, 3),
 (11, 'Écran éteint',            'Écran du hall central totalement éteint.',           'HAUTE',    'OUVERT',   NOW() - INTERVAL 6 HOUR,  NULL, NULL, NULL, NULL, 2),
-(7,  'Bruit anormal escalator', 'Bruit métallique au démarrage de l''escalator.',     'NORMALE',  'OUVERT', NOW() - INTERVAL 3 DAY,   1, NOW() - INTERVAL 70 HOUR,NULL, NULL, 3);
+(7,  'Bruit anormal escalator', 'Bruit métallique au démarrage de l''escalator.',     'NORMALE',  'AFFECTE', NOW() - INTERVAL 3 DAY,   1, NOW() - INTERVAL 70 HOUR,NULL, NULL, 3);
 
 -- Résolus
 INSERT INTO incident (equipement_id, titre, description, priorite, statut, date_ouverture, prestataire_id, date_affectation, date_resolution, commentaire_resolution, declare_par) VALUES
@@ -73,3 +64,12 @@ INSERT INTO incident (equipement_id, titre, description, priorite, statut, date_
 (6, 'Affichage erroné',          'Horaires affichés incorrects.',              'BASSE',   'RESOLU',  NOW() - INTERVAL 5 DAY,  4, NOW() - INTERVAL 5 DAY + INTERVAL 1 HOUR,  NOW() - INTERVAL 4 DAY,  'Mise à jour du logiciel.',   2),
 (9, 'Portique en alarme',        'Alarme sonore intempestive.',                'NORMALE', 'RESOLU', NOW() - INTERVAL 40 DAY, 2, NOW() - INTERVAL 40 DAY + INTERVAL 1 HOUR, NOW() - INTERVAL 39 DAY, 'Recalibrage du capteur.',   3),
 (2, 'Escalator à l''arrêt',      'Arrêt d''urgence déclenché.',                'HAUTE',   'RESOLU', NOW() - INTERVAL 25 DAY, 5, NOW() - INTERVAL 25 DAY + INTERVAL 2 HOUR, NOW() - INTERVAL 24 DAY, 'Remise en route après contrôle.', 2);
+
+-- Évaluations (ids 1 à 6, rattachées ensuite aux incidents résolus)
+INSERT INTO evaluation(incident_id, note, commentaire, date_evaluation, evalue_par)VALUES
+(5, 5, 'Intervention rapide et efficace.', NOW() - INTERVAL 18 DAY, 2),
+(6, 3, 'Résolu, mais délai un peu long.', NOW() - INTERVAL 13 DAY, 2),
+(7, 4, NULL, NOW() - INTERVAL 26 DAY, 2),
+(8, 4, 'Bonne réactivité.', NOW() - INTERVAL 3 DAY, 2),
+(9, 2, 'Panne revenue deux fois, travail bâclé.', NOW() - INTERVAL 38 DAY, 2),
+(10, 5, NULL, NOW() - INTERVAL 23 DAY, 2);

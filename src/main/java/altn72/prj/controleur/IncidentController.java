@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,14 +25,14 @@ public class IncidentController {
 
 
     @GetMapping("/{idIncident}")
-    public ResponseEntity<Incident> afficherUnIncident(@PathVariable("idIncident") Long idInc) {
+    public ResponseEntity<Incident> afficherUnIncident(@PathVariable("idIncident") Integer idInc) {
         return incidentService.getIncident(idInc)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{idIncident}")
-    public ResponseEntity<Void> deleteIncident(@PathVariable("idIncident") Long idIncident) {
+    public ResponseEntity<Void> deleteIncident(@PathVariable("idIncident") Integer idIncident) {
         if (incidentService.supprimerIncident(idIncident)) return ResponseEntity.noContent().build();
         return ResponseEntity.notFound().build();
     }
@@ -50,19 +50,19 @@ public class IncidentController {
 
     //TODO : Définir ce qui doit être modifier et par qui
     @PutMapping("/{idIncident}")
-    public ResponseEntity<Incident> modifierIncident(@PathVariable Long idIncident, @ModelAttribute Incident incidentModifie) {
+    public ResponseEntity<Incident> modifierIncident(@PathVariable Integer idIncident, @ModelAttribute Incident incidentModifie) {
         return incidentService.modifierIncident(idIncident, incidentModifie)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/resolu/{idIncident}")
-    public ResponseEntity<Incident> fermeIncident(@PathVariable Long idIncident) {
+    public ResponseEntity<Incident> fermeIncident(@PathVariable Integer idIncident) {
         Optional<Incident> incidentFerme = incidentService.getIncident(idIncident);
 
         if (incidentFerme.isPresent() && incidentFerme.get().getStatut() != IncidentStatut.RESOLU) {
             incidentFerme.get().setStatut(IncidentStatut.RESOLU);
-            incidentFerme.get().setDateResolution(Instant.now());
+            incidentFerme.get().setDateResolution(LocalDateTime.now());
         }else  return ResponseEntity.notFound().build();
 
         return incidentService.modifierIncident(idIncident, incidentFerme.get())
@@ -72,12 +72,12 @@ public class IncidentController {
 
     //TODO : Mettre l'id de prestataire et non l'objet (ou à gérer à un autre niveau)
     @PostMapping("affecter/{idIncident}")
-    public ResponseEntity<Incident> affecterIncident(@PathVariable Long idIncident, Prestataire prestataire) {
+    public ResponseEntity<Incident> affecterIncident(@PathVariable Integer idIncident, Prestataire prestataire) {
         Optional<Incident> incidentFerme = incidentService.getIncident(idIncident);
 
         if (incidentFerme.isPresent() && incidentFerme.get().getStatut() != IncidentStatut.RESOLU) {
             incidentFerme.get().setPrestataire(prestataire);
-            incidentFerme.get().setDateAffectation(Instant.now());
+            incidentFerme.get().setDateAffectation(LocalDateTime.now());
         }else  return ResponseEntity.notFound().build();
 
         return incidentService.modifierIncident(idIncident, incidentFerme.get())

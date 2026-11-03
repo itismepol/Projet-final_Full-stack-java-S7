@@ -3,7 +3,7 @@ package altn72.prj.modele;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "prestataire")
@@ -11,7 +11,7 @@ public class Prestataire {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", columnDefinition = "int UNSIGNED not null")
-    private Long id;
+    private Integer id;
 
     @Column(name = "nom", nullable = false, length = 120)
     private String nom;
@@ -28,19 +28,28 @@ public class Prestataire {
     @Column(name = "specialite", length = 100)
     private String specialite;
 
-    @ColumnDefault("1")
     @Column(name = "actif", nullable = false)
-    private Boolean actif;
+    private Boolean actif = true;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "date_creation", nullable = false)
-    private Instant dateCreation;
+    private LocalDateTime dateCreation;
 
-    public Long getId() {
+    @PrePersist
+    public void prePersist() {
+        if (actif == null) {
+            actif = true;
+        }
+
+        if (dateCreation == null) {
+            dateCreation = LocalDateTime.now();
+        }
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -92,11 +101,11 @@ public class Prestataire {
         this.actif = actif;
     }
 
-    public Instant getDateCreation() {
+    public LocalDateTime getDateCreation() {
         return dateCreation;
     }
 
-    public void setDateCreation(Instant dateCreation) {
+    public void setDateCreation(LocalDateTime dateCreation) {
         this.dateCreation = dateCreation;
     }
 

@@ -1,11 +1,10 @@
 package altn72.prj.modele;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "evaluation")
@@ -13,37 +12,46 @@ public class Evaluation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", columnDefinition = "int UNSIGNED not null")
-    private Long id;
+    private Integer id;
 
-    @Column(name = "note", columnDefinition = "tinyint UNSIGNED not null")
-    private Short note;
+    @Column(name = "note", columnDefinition = "int UNSIGNED")
+    private Integer note;
 
-    @Lob
-    @Column(name = "commentaire")
+    @Column(name = "commentaire", columnDefinition = "TEXT")
     private String commentaire;
 
-    @ColumnDefault("CURRENT_TIMESTAMP")
     @Column(name = "date_evaluation", nullable = false)
-    private Instant dateEvaluation;
+    private LocalDateTime dateEvaluation;
+
+    @PrePersist
+    public void prePersist() {
+        if (dateEvaluation == null) {
+            dateEvaluation = LocalDateTime.now();
+        }
+    }
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "evalue_par")
     private Utilisateur evaluePar;
 
-    public Long getId() {
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "incident_id", nullable = false)
+    private Incident incident;
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public Short getNote() {
+    public Integer getNote() {
         return note;
     }
 
-    public void setNote(Short note) {
+    public void setNote(Integer note) {
         this.note = note;
     }
 
@@ -55,11 +63,11 @@ public class Evaluation {
         this.commentaire = commentaire;
     }
 
-    public Instant getDateEvaluation() {
+    public LocalDateTime getDateEvaluation() {
         return dateEvaluation;
     }
 
-    public void setDateEvaluation(Instant dateEvaluation) {
+    public void setDateEvaluation(LocalDateTime dateEvaluation) {
         this.dateEvaluation = dateEvaluation;
     }
 
@@ -71,4 +79,11 @@ public class Evaluation {
         this.evaluePar = evaluePar;
     }
 
+    public Incident getIncident() {
+        return incident;
+    }
+
+    public void setIncident(Incident incident) {
+        this.incident = incident;
+    }
 }
