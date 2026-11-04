@@ -5,6 +5,7 @@ import altn72.prj.modele.Incident;
 import altn72.prj.modele.Station;
 import altn72.prj.service.ConsultationEquipementService;
 import altn72.prj.service.IncidentService;
+import altn72.prj.service.StationService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,22 +19,24 @@ import java.util.List;
 @RequestMapping("/stations")
 public class StationController {
 
+    private final StationService stationService;
     private final ConsultationEquipementService consultationEquipementService;
     private final IncidentService incidentService;
 
-    public StationController(ConsultationEquipementService consultationEquipementService, IncidentService incidentService) {
+    public StationController(StationService stationService, ConsultationEquipementService consultationEquipementService, IncidentService incidentService) {
+        this.stationService = stationService;
         this.consultationEquipementService = consultationEquipementService;
         this.incidentService = incidentService;
     }
 
     @GetMapping()
     public ResponseEntity<List<Station>> getAllStations() {
-        return ResponseEntity.ok(consultationEquipementService.getAllStations());
+        return ResponseEntity.ok(stationService.getAllStations());
     }
 
     @GetMapping("{idStation}")
     public ResponseEntity<Station> afficherUneStation(@PathVariable("idStation") Integer idStation) {
-        return consultationEquipementService.consulterStation(idStation)
+        return stationService.consulterStation(idStation)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

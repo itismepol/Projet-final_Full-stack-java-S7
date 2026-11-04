@@ -2,7 +2,6 @@ package altn72.prj.service;
 
 import altn72.prj.modele.Equipement;
 import altn72.prj.modele.Incident;
-import altn72.prj.modele.Station;
 import altn72.prj.exception.EquipementNotFoundException;
 import altn72.prj.repository.EquipementRepository;
 import altn72.prj.repository.IncidentRepository;
@@ -28,24 +27,8 @@ public class ConsultationEquipementService {
         this.incidentRepository = incidentRepository;
     }
 
-    public List<Station> getAllStations() {
-        return stationRepository.findAll();
-    }
-
-    public Optional<Station> consulterStation(Integer idStation) {
-        return stationRepository.findById(idStation);
-    }
-
-    public List<Station> listerStations() {
-        return stationRepository.findAllByOrderByNom();
-    }
-
     public Optional<Equipement> getEquipement(Integer idEquipement) {
         return equipementRepository.findById(idEquipement);
-    }
-
-    public List<Station> getStations() {
-        return stationRepository.findAll();
     }
 
     public List<Equipement> getEquipements() {
@@ -59,26 +42,6 @@ public class ConsultationEquipementService {
     public EquipementEtIncidents getEquipementEtIncidents(Integer idEquipement) {
         Equipement equipement = getEquipement(idEquipement).orElseThrow(() -> new EquipementNotFoundException(idEquipement));
         return new EquipementEtIncidents(equipement, incidentRepository.findByEquipement(idEquipement));
-    }
-
-    @Transactional
-    public boolean supprimerStation(Integer idStation) {
-        if (!stationRepository.existsById(idStation)) return false;
-        stationRepository.deleteById(idStation);
-        return true;
-    }
-
-    public Station ajouterStation(Station station) {
-        station.setId(null);
-        return stationRepository.save(station);
-    }
-
-    @Transactional
-    public Optional<Station> modifierStation(Integer idStation, Station stationModifie) {
-        return stationRepository.findById(idStation).map(stationToModify -> {
-            BeanUtils.copyProperties(stationModifie, stationToModify, "id");
-            return stationToModify;
-        });
     }
 
     @Transactional
@@ -99,8 +62,6 @@ public class ConsultationEquipementService {
             BeanUtils.copyProperties(equipementModifie, equipementToModify, "id");
             return equipementToModify;
         });
-
-
     }
 
     public record EquipementEtIncidents(Equipement equipement, List<Incident> incidents) {}

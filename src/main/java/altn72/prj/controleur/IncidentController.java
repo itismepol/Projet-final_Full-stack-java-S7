@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/indicateur")
+@RequestMapping("/incidents")
 public class IncidentController {
 
     private final IncidentService incidentService;
