@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/me")
 public class UtilisateurController {
 
     private final UtilisateurService utilisateurService;
@@ -18,7 +18,7 @@ public class UtilisateurController {
         this.utilisateurService = utilisateurService;
     }
 
-    @GetMapping("/me")
+    @GetMapping()
     public UtilisateurDto utilisateurCourant(@AuthenticationPrincipal UtilisateurConnecte principal) {
         return utilisateurService.trouverParLogin(principal.getUsername());
     }
