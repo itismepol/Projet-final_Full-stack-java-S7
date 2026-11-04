@@ -36,6 +36,14 @@ public class IncidentService {
         return incidentRepository.getAllResolveIncidentsByStation(idStation);
     }
 
+    public List<Incident> getAllResolveIncidentsByEquipment(Integer idEquipment) {
+        return incidentRepository.getAllResolveIncidentsByEquipment(idEquipment);
+    }
+
+    public List<Incident> getIncidentsByEquipment(Integer idEquipment) {
+        return incidentRepository.getIncidentsByEquipment(idEquipment);
+    }
+
     @Transactional
     public boolean supprimerIncident(Integer idIncident) {
         if (!incidentRepository.existsById(idIncident)) return false;
