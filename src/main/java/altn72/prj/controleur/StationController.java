@@ -17,9 +17,13 @@ public class StationController {
 
     private final ConsultationEquipementService consultationEquipementService;
 
-
     public StationController(ConsultationEquipementService consultationEquipementService) {
         this.consultationEquipementService = consultationEquipementService;
+    }
+
+    @GetMapping()
+    public ResponseEntity<List<Station>> getAllStations() {
+        return ResponseEntity.ok(consultationEquipementService.getAllStations());
     }
 
     @GetMapping("{idStation}")

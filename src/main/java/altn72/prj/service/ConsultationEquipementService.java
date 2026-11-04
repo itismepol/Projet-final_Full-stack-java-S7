@@ -28,6 +28,10 @@ public class ConsultationEquipementService {
         this.incidentRepository = incidentRepository;
     }
 
+    public List<Station> getAllStations() {
+        return stationRepository.findAll();
+    }
+
     public Optional<Station> consulterStation(Integer idStation) {
         return stationRepository.findById(idStation);
     }
