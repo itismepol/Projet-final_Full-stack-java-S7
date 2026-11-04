@@ -15,7 +15,7 @@ public class UtilisateurConnecte extends User {
     public UtilisateurConnecte(Utilisateur utilisateur) {
         super(utilisateur.getLogin(),
                 utilisateur.getMotDePasse(),
-                utilisateur.isActif(), true, true, true,
+                true, true, true, true,
                 List.of(new SimpleGrantedAuthority("ROLE_" + utilisateur.getProfil().name())));
         this.prenom = utilisateur.getPrenom();
         this.profil = utilisateur.getProfil();
