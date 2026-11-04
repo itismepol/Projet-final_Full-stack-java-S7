@@ -4,12 +4,16 @@ import altn72.prj.controleur.IncidentController;
 import altn72.prj.modele.Incident;
 
 import altn72.prj.modele.IncidentStatut;
+import altn72.prj.modele.Prestataire;
 import altn72.prj.repository.EquipementRepository;
 import altn72.prj.repository.IncidentRepository;
+import altn72.prj.repository.PrestataireRepository;
 import altn72.prj.repository.UtilisateurRepository;
 
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.beans.BeanUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,11 +26,13 @@ public class IncidentService {
     private final IncidentRepository incidentRepository;
     private final EquipementRepository equipmentRepository;
     private final UtilisateurRepository userRepository;
+    private final PrestataireRepository prestaRepository;
 
-    public IncidentService(IncidentRepository incidentRepository, EquipementRepository equipmentRepository, UtilisateurRepository userRepository){
+    public IncidentService(IncidentRepository incidentRepository, EquipementRepository equipmentRepository, UtilisateurRepository userRepository, PrestataireRepository prestaRepository){
         this.incidentRepository = incidentRepository;
         this.equipmentRepository = equipmentRepository;
         this.userRepository = userRepository;
+        this.prestaRepository = prestaRepository;
     }
 
     public Optional<Incident> getIncident(Integer idIncident) {
@@ -73,6 +79,22 @@ public class IncidentService {
             userRepository.findByLogin(auth).ifPresent(incident::setDeclarePar);
             return incidentRepository.save(incident);
         });
+    }
+
+    @Transactional
+    public Optional<Incident> affectPresta(Integer idIncident, Integer idPrestataire) {
+        Optional<Incident> incident = incidentRepository.findById(idIncident);
+        Optional<Prestataire> prestataire = prestaRepository.findById(idPrestataire);
+        if (incident.isEmpty() || prestataire.isEmpty()) return Optional.empty();
+
+        Incident i = incident.get();
+        if (i.getStatut() == IncidentStatut.RESOLU) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Incident déjà résolu");
+        }
+        i.setPrestataire(prestataire.get());
+        i.setDateAffectation(LocalDateTime.now());
+        i.setStatut(IncidentStatut.AFFECTE);
+        return Optional.of(i);
     }
 
     @Transactional

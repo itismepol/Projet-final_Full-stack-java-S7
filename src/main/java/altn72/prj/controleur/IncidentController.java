@@ -50,7 +50,6 @@ public class IncidentController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    //TODO : Définir ce qui doit être modifier et par qui
     @PutMapping("/{idIncident}")
     public ResponseEntity<Incident> modifierIncident(@PathVariable Integer idIncident, @ModelAttribute Incident incidentModifie) {
         return incidentService.modifierIncident(idIncident, incidentModifie)
@@ -72,17 +71,9 @@ public class IncidentController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    //TODO : Mettre l'id de prestataire et non l'objet (ou à gérer à un autre niveau)
-    @PostMapping("affecter/{idIncident}")
-    public ResponseEntity<Incident> affecterIncident(@PathVariable Integer idIncident, Prestataire prestataire) {
-        Optional<Incident> incidentFerme = incidentService.getIncident(idIncident);
-
-        if (incidentFerme.isPresent() && incidentFerme.get().getStatut() != IncidentStatut.RESOLU) {
-            incidentFerme.get().setPrestataire(prestataire);
-            incidentFerme.get().setDateAffectation(LocalDateTime.now());
-        }else  return ResponseEntity.notFound().build();
-
-        return incidentService.modifierIncident(idIncident, incidentFerme.get())
+    @PutMapping("/{idIncident}/prestataire")
+    public ResponseEntity<Incident> affecterPrestataire(@PathVariable Integer idIncident, @RequestBody AffectationRequest requete) {
+        return incidentService.affectPresta(idIncident, requete.prestataireId())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -93,5 +84,6 @@ public class IncidentController {
     }
 
     public record CreationIncidentRequest(Integer equipementId, String titre, String description, IncidentPriorite priorite) {}
+    public record AffectationRequest(Integer prestataireId) {}
 
 }
