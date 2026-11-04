@@ -1,13 +1,18 @@
 package altn72.prj.service;
 
+import altn72.prj.controleur.IncidentController;
 import altn72.prj.modele.Incident;
 
 import altn72.prj.modele.IncidentStatut;
+import altn72.prj.repository.EquipementRepository;
 import altn72.prj.repository.IncidentRepository;
+import altn72.prj.repository.UtilisateurRepository;
+
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,9 +20,13 @@ import java.util.Optional;
 public class IncidentService {
 
     private final IncidentRepository incidentRepository;
+    private final EquipementRepository equipmentRepository;
+    private final UtilisateurRepository userRepository;
 
-    public IncidentService(IncidentRepository incidentRepository){
+    public IncidentService(IncidentRepository incidentRepository, EquipementRepository equipmentRepository, UtilisateurRepository userRepository){
         this.incidentRepository = incidentRepository;
+        this.equipmentRepository = equipmentRepository;
+        this.userRepository = userRepository;
     }
 
     public Optional<Incident> getIncident(Integer idIncident) {
@@ -51,9 +60,19 @@ public class IncidentService {
         return true;
     }
 
-     public Incident ajouterIncident(Incident incident) {
-        incident.setId(null);
-        return incidentRepository.save(incident);
+    @Transactional
+    public Optional<Incident> creerIncident(IncidentController.CreationIncidentRequest dataForm, String auth) {
+        return equipmentRepository.findById(dataForm.equipementId()).map(equipement -> {
+            Incident incident = new Incident();
+            incident.setEquipement(equipement);
+            incident.setTitre(dataForm.titre());
+            incident.setDescription(dataForm.description());
+            if (dataForm.priorite() != null) incident.setPriorite(dataForm.priorite());
+            incident.setStatut(IncidentStatut.OUVERT);
+            incident.setDateOuverture(LocalDateTime.now());
+            userRepository.findByLogin(auth).ifPresent(incident::setDeclarePar);
+            return incidentRepository.save(incident);
+        });
     }
 
     @Transactional

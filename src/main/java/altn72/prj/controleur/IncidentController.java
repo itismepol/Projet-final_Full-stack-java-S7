@@ -1,12 +1,14 @@
 package altn72.prj.controleur;
 
 import altn72.prj.modele.Incident;
+import altn72.prj.modele.IncidentPriorite;
 import altn72.prj.modele.IncidentStatut;
 import altn72.prj.modele.Prestataire;
 import altn72.prj.service.IncidentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.security.core.Authentication;
 
 import java.net.URI;
 import java.time.LocalDateTime;
@@ -38,14 +40,14 @@ public class IncidentController {
     }
 
     @PostMapping
-    public ResponseEntity<Incident> creerIncident(@RequestBody Incident incident) {
-        Incident incidentCree = incidentService.ajouterIncident(incident);
-
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(incidentCree.getId())
-                .toUri();
-        return ResponseEntity.created(location).body(incidentCree);
+    public ResponseEntity<Incident> creerIncident(@RequestBody CreationIncidentRequest dataForm, Authentication auth) {
+        return incidentService.creerIncident(dataForm, auth.getName())
+                .map(incident -> {
+                    URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                            .path("/{id}").buildAndExpand(incident.getId()).toUri();
+                    return ResponseEntity.created(location).body(incident);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     //TODO : Définir ce qui doit être modifier et par qui
@@ -89,4 +91,7 @@ public class IncidentController {
     public ResponseEntity<List<Incident>> listerIncidents() {
         return incidentService.getHistorique().isEmpty() ? ResponseEntity.ok(incidentService.getHistorique()) : ResponseEntity.noContent().build();
     }
+
+    public record CreationIncidentRequest(Integer equipementId, String titre, String description, IncidentPriorite priorite) {}
+
 }
