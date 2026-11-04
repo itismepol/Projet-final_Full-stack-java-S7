@@ -21,4 +21,9 @@ public interface IncidentRepository extends JpaRepository<Incident, Integer> {
 
     @Query("SELECT i FROM Incident i WHERE i.statut <> altn72.prj.modele.IncidentStatut.RESOLU AND i.equipement.id = :idEquipment ORDER BY i.dateOuverture")
     List<Incident> getIncidentsByEquipment(@Param("idEquipment") Integer idEquipment);
+
+    @Query("SELECT i FROM Incident i WHERE i.prestataire.id = :idPrestataire " +
+       "AND EXISTS (SELECT e FROM Evaluation e WHERE e.incident = i) " +
+       "ORDER BY i.dateResolution DESC")
+    List<Incident> getIncidentsEvaluesByPrestataire(@Param("idPrestataire") Integer idPrestataire);
 }
