@@ -32,6 +32,9 @@ public class IncidentService {
         return incidentRepository.findByStatutOrderByDateResolutionDesc(IncidentStatut.RESOLU);
     }
 
+    public List<Incident> getAllResolveIncidentsByStation(Integer idStation) {
+        return incidentRepository.getAllResolveIncidentsByStation(idStation);
+    }
 
     @Transactional
     public boolean supprimerIncident(Integer idIncident) {

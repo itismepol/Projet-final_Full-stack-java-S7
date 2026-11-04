@@ -1,8 +1,11 @@
 package altn72.prj.controleur;
 
 import altn72.prj.modele.Equipement;
+import altn72.prj.modele.Incident;
 import altn72.prj.modele.Station;
 import altn72.prj.service.ConsultationEquipementService;
+import altn72.prj.service.IncidentService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,9 +19,11 @@ import java.util.List;
 public class StationController {
 
     private final ConsultationEquipementService consultationEquipementService;
+    private final IncidentService incidentService;
 
-    public StationController(ConsultationEquipementService consultationEquipementService) {
+    public StationController(ConsultationEquipementService consultationEquipementService, IncidentService incidentService) {
         this.consultationEquipementService = consultationEquipementService;
+        this.incidentService = incidentService;
     }
 
     @GetMapping()
@@ -37,7 +42,12 @@ public class StationController {
     public ResponseEntity<List<Equipement>> afficherEquipementsStation(@PathVariable Integer idStation){
         List<Equipement> equipements = consultationEquipementService.listerEquipementsStation(idStation);
         return equipements.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(equipements);
-
     }
+
+    @GetMapping("{idStation}/history")
+    public ResponseEntity<List<Incident>> getAllResolveIncidentsByStation(@PathVariable Integer idStation){
+        List<Incident> incidents = incidentService.getAllResolveIncidentsByStation(idStation);
+        return incidents.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(incidents);
+    } 
 
 }
