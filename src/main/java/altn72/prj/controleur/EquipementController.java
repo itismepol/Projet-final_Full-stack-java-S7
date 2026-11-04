@@ -7,7 +7,6 @@ import altn72.prj.service.ConsultationEquipementService;
 
 import java.util.List;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,20 +25,18 @@ public class EquipementController {
     }
 
     @GetMapping("{idEquipement}")
-    public ResponseEntity<Equipement> getEquipementEtIncidents(@PathVariable("idEquipement") Integer idEquipement) {
-        return consultationEquipementService.getEquipement(idEquipement)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Equipement getEquipementEtIncidents(@PathVariable("idEquipement") Integer idEquipement) {
+        return consultationEquipementService.getEquipement(idEquipement);
     }
 
     @GetMapping("/{idEquipement}/incidents")
-    public ResponseEntity<List<Incident>> getIncidentsByEquipment(@PathVariable Integer idEquipement){
-        return ResponseEntity.ok(incidentRepository.getIncidentsByEquipment(idEquipement));
+    public List<Incident> getIncidentsByEquipment(@PathVariable Integer idEquipement){
+        return incidentRepository.getIncidentsByEquipment(idEquipement);
     }
 
     @GetMapping("/{idEquipement}/history")
-    public ResponseEntity<List<Incident>> getHistoryIncidentByEquipment(@PathVariable Integer idEquipement){
-        return ResponseEntity.ok(incidentRepository.getAllResolveIncidentsByEquipment(idEquipement));
+    public List<Incident> getHistoryIncidentByEquipment(@PathVariable Integer idEquipement){
+        return incidentRepository.getAllResolveIncidentsByEquipment(idEquipement);
     }
 
 }

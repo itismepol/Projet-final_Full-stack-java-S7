@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface PrestataireRepository extends JpaRepository<Prestataire, Integer> {
     List<Prestataire> findByActifTrue();
+    boolean existsByNom(String nom);
 }

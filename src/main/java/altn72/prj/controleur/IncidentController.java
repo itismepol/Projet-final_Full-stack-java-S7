@@ -1,9 +1,13 @@
 package altn72.prj.controleur;
 
+import altn72.prj.dto.AffectationRequest;
+import altn72.prj.dto.CreationIncidentRequest;
+import altn72.prj.dto.EvaluationRequest;
 import altn72.prj.modele.Incident;
-import altn72.prj.modele.IncidentPriorite;
 import altn72.prj.service.IncidentService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.security.core.Authentication;
@@ -23,64 +27,57 @@ public class IncidentController {
 
 
     @GetMapping("/{idIncident}")
-    public ResponseEntity<Incident> afficherUnIncident(@PathVariable("idIncident") Integer idInc) {
-        return incidentService.getIncident(idInc)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Incident afficherUnIncident(@PathVariable("idIncident") Integer idInc) {
+        return incidentService.getIncident(idInc);
     }
 
+    @GetMapping("/historique")
+    public List<Incident> historique() {
+        return incidentService.getHistorique();
+    }
+
+    @PreAuthorize("hasRole('RESPONSABLE_EXPLOITATION')")
     @DeleteMapping("/{idIncident}")
-    public ResponseEntity<Void> deleteIncident(@PathVariable("idIncident") Integer idIncident) {
-        if (incidentService.supprimerIncident(idIncident)) return ResponseEntity.noContent().build();
-        return ResponseEntity.notFound().build();
+    public void deleteIncident(@PathVariable("idIncident") Integer idIncident) {
+        incidentService.supprimerIncident(idIncident);
     }
 
     @PostMapping
-    public ResponseEntity<Incident> creerIncident(@RequestBody CreationIncidentRequest dataForm, Authentication auth) {
-        return incidentService.creerIncident(dataForm, auth.getName())
-                .map(incident -> {
-                    URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                            .path("/{id}").buildAndExpand(incident.getId()).toUri();
-                    return ResponseEntity.created(location).body(incident);
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Incident> creerIncident(@Valid @RequestBody CreationIncidentRequest dataForm,
+                                                  Authentication auth) {
+        Incident incident = incidentService.creerIncident(dataForm, auth.getName());
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}").buildAndExpand(incident.getId()).toUri();
+        return ResponseEntity.created(location).body(incident);
     }
 
+    @PreAuthorize("hasRole('RESPONSABLE_EXPLOITATION')")
     @PutMapping("/{idIncident}")
-    public ResponseEntity<Incident> modifierIncident(@PathVariable Integer idIncident, @ModelAttribute Incident incidentModifie) {
-        return incidentService.modifierIncident(idIncident, incidentModifie)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Incident modifierIncident(@PathVariable Integer idIncident, @ModelAttribute Incident incidentModifie) {
+        return incidentService.modifierIncident(idIncident, incidentModifie);
     }
 
+    @PreAuthorize("hasRole('RESPONSABLE_EXPLOITATION')")
     @PutMapping("/{idIncident}/resolve")
-    public ResponseEntity<Incident> resoudreIncident(@PathVariable Integer idIncident) {
-        return incidentService.resolveIncident(idIncident)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Incident resoudreIncident(@PathVariable Integer idIncident) {
+        return incidentService.resolveIncident(idIncident);
     }
 
+    @PreAuthorize("hasRole('RESPONSABLE_EXPLOITATION')")
     @PutMapping("/{idIncident}/prestataire")
-    public ResponseEntity<Incident> affecterPrestataire(@PathVariable Integer idIncident, @RequestBody AffectationRequest requete) {
-        return incidentService.affectPresta(idIncident, requete.prestataireId())
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Incident affecterPrestataire(@PathVariable Integer idIncident, @RequestBody AffectationRequest requete) {
+        return incidentService.affectPresta(idIncident, requete.prestataireId());
     }
 
     @GetMapping("Historique/Incident")
-    public ResponseEntity<List<Incident>> listerIncidents() {
-        return incidentService.getHistorique().isEmpty() ? ResponseEntity.ok(incidentService.getHistorique()) : ResponseEntity.noContent().build();
+    public List<Incident> listerIncidents() {
+        return incidentService.getHistorique();
     }
 
+    @PreAuthorize("hasRole('RESPONSABLE_EXPLOITATION')")
     @PostMapping("/{idIncident}/evaluation")
-    public ResponseEntity<Incident> evaluateIncident(@PathVariable Integer idIncident, @RequestBody EvaluationRequest requete, Authentication authentication) {
-        return incidentService.evaluateIncident(idIncident, requete, authentication.getName())
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Incident evaluateIncident(@PathVariable Integer idIncident, @Valid @RequestBody EvaluationRequest requete, Authentication authentication) {
+        return incidentService.evaluateIncident(idIncident, requete, authentication.getName());
     }
-
-    public record CreationIncidentRequest(Integer equipementId, String titre, String description, IncidentPriorite priorite) {}
-    public record AffectationRequest(Integer prestataireId) {}
-    public record EvaluationRequest(Integer note, String commentaire) {}
 
 }

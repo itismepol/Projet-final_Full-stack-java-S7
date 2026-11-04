@@ -1,6 +1,8 @@
 package altn72.prj.modele;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,6 +13,7 @@ public class Prestataire {
     @Column(name = "id", columnDefinition = "int UNSIGNED not null")
     private Integer id;
 
+    @NotBlank(message = "Le nom du prestataire est obligatoire.")
     @Column(name = "nom", nullable = false, length = 120)
     private String nom;
 

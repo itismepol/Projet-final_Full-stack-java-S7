@@ -1,14 +1,17 @@
 package altn72.prj.service;
 
+import altn72.prj.exception.DonneeInvalideException;
+import altn72.prj.exception.OperationInterditeException;
+import altn72.prj.exception.RessourceIntrouvableException;
 import altn72.prj.modele.Incident;
 import altn72.prj.modele.Prestataire;
 import altn72.prj.repository.IncidentRepository;
 import altn72.prj.repository.PrestataireRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -30,18 +33,24 @@ public class PrestataireService {
         return prestataireRepository.findByActifTrue();
     }
 
-    public Optional<Prestataire> consulterPrestataire(Integer idPrestataire) {
-        return prestataireRepository.findById(idPrestataire);
+    public Prestataire consulterPrestataire(Integer idPrestataire) {
+        return prestataireRepository.findById(idPrestataire)            .orElseThrow(() -> new RessourceIntrouvableException("Prestataire", idPrestataire));
     }
 
     @Transactional
     public Prestataire ajouterPrestataire(Prestataire prestataire) {
+        if (!StringUtils.hasText(prestataire.getEmail()) && !StringUtils.hasText(prestataire.getTelephone())) {
+            throw new DonneeInvalideException("Renseignez au moins un moyen de contact (email ou téléphone).");
+        }
+        if (prestataireRepository.existsByNom(prestataire.getNom())) {
+            throw new OperationInterditeException("Un prestataire porte déjà ce nom.");
+        }
         prestataire.setId(null);
         return prestataireRepository.save(prestataire);
     }
 
-    public Optional<List<Incident>> getIncidentsEvaluesByPrestataire(Integer idPrestataire) {
-        if (!prestataireRepository.existsById(idPrestataire)) return Optional.empty();
-        return Optional.of(incidentRepository.getIncidentsEvaluesByPrestataire(idPrestataire));
+    public List<Incident> getIncidentsEvaluesByPrestataire(Integer idPrestataire) {
+        consulterPrestataire(idPrestataire);
+        return incidentRepository.getIncidentsEvaluesByPrestataire(idPrestataire);
     }
 }

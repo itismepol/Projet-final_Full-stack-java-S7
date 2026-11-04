@@ -7,7 +7,6 @@ import altn72.prj.service.ConsultationEquipementService;
 import altn72.prj.service.IncidentService;
 import altn72.prj.service.StationService;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,27 +29,23 @@ public class StationController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Station>> getAllStations() {
-        return ResponseEntity.ok(stationService.getAllStations());
+    public List<Station> getAllStations() {
+        return stationService.getAllStations();
     }
 
     @GetMapping("{idStation}")
-    public ResponseEntity<Station> afficherUneStation(@PathVariable("idStation") Integer idStation) {
-        return stationService.consulterStation(idStation)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Station afficherUneStation(@PathVariable("idStation") Integer idStation) {
+        return stationService.consulterStation(idStation);
     }
 
     @GetMapping("/{idStation}/equipements")
-    public ResponseEntity<List<Equipement>> afficherEquipementsStation(@PathVariable Integer idStation){
-        List<Equipement> equipements = consultationEquipementService.listerEquipementsStation(idStation);
-        return equipements.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(equipements);
+    public List<Equipement> afficherEquipementsStation(@PathVariable Integer idStation) {
+        return consultationEquipementService.listerEquipementsStation(idStation);
     }
 
     @GetMapping("{idStation}/history")
-    public ResponseEntity<List<Incident>> getAllResolveIncidentsByStation(@PathVariable Integer idStation){
-        List<Incident> incidents = incidentService.getAllResolveIncidentsByStation(idStation);
-        return incidents.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(incidents);
-    } 
+    public List<Incident> getAllResolveIncidentsByStation(@PathVariable Integer idStation) {
+        return incidentService.getAllResolveIncidentsByStation(idStation);
+    }
 
 }

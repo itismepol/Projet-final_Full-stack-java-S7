@@ -1,9 +1,8 @@
 package altn72.prj.service;
 
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.beans.BeanUtils;
+import altn72.prj.exception.RessourceIntrouvableException;
 import org.springframework.stereotype.Service;
 
 import altn72.prj.modele.Station;
@@ -23,32 +22,9 @@ public class StationService {
         return stationRepository.findAll();
     }
 
-    public Optional<Station> consulterStation(Integer idStation) {
-        return stationRepository.findById(idStation);
-    }
+    public Station consulterStation(Integer idStation) {
+        return stationRepository.findById(idStation)
+                .orElseThrow(() -> new RessourceIntrouvableException("Station", idStation));
 
-    public List<Station> listerStations() {
-        return stationRepository.findAllByOrderByNom();
     }
-
-    @Transactional
-    public boolean supprimerStation(Integer idStation) {
-        if (!stationRepository.existsById(idStation)) return false;
-        stationRepository.deleteById(idStation);
-        return true;
-    }
-
-    public Station ajouterStation(Station station) {
-        station.setId(null);
-        return stationRepository.save(station);
-    }
-
-    @Transactional
-    public Optional<Station> modifierStation(Integer idStation, Station stationModifie) {
-        return stationRepository.findById(idStation).map(stationToModify -> {
-            BeanUtils.copyProperties(stationModifie, stationToModify, "id");
-            return stationToModify;
-        });
-    }
-
 }
