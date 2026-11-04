@@ -2,8 +2,6 @@ package altn72.prj.controleur;
 
 import altn72.prj.modele.Incident;
 import altn72.prj.modele.IncidentPriorite;
-import altn72.prj.modele.IncidentStatut;
-import altn72.prj.modele.Prestataire;
 import altn72.prj.service.IncidentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,9 +9,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.security.core.Authentication;
 
 import java.net.URI;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/incidents")
@@ -57,16 +53,9 @@ public class IncidentController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/resolu/{idIncident}")
-    public ResponseEntity<Incident> fermeIncident(@PathVariable Integer idIncident) {
-        Optional<Incident> incidentFerme = incidentService.getIncident(idIncident);
-
-        if (incidentFerme.isPresent() && incidentFerme.get().getStatut() != IncidentStatut.RESOLU) {
-            incidentFerme.get().setStatut(IncidentStatut.RESOLU);
-            incidentFerme.get().setDateResolution(LocalDateTime.now());
-        }else  return ResponseEntity.notFound().build();
-
-        return incidentService.modifierIncident(idIncident, incidentFerme.get())
+    @PutMapping("/{idIncident}/resolve")
+    public ResponseEntity<Incident> resoudreIncident(@PathVariable Integer idIncident) {
+        return incidentService.resolveIncident(idIncident)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }

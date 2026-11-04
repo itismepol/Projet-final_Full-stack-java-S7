@@ -104,4 +104,18 @@ public class IncidentService {
             return incidentToModify;
         });
     }
+
+    @Transactional
+    public Optional<Incident> resolveIncident(Integer idIncident) {
+        return incidentRepository.findById(idIncident).map(i -> {
+            if (i.getStatut() == IncidentStatut.RESOLU) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Incident déjà résolu");
+            } else if (i.getStatut() == IncidentStatut.OUVERT) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "L'incident doit être affecté avant d'être résolu");
+            }
+            i.setStatut(IncidentStatut.RESOLU);
+            i.setDateResolution(LocalDateTime.now());
+            return i;
+        });
+    }
 }
