@@ -1,11 +1,13 @@
 package altn72.prj.service;
 
 import altn72.prj.controleur.IncidentController;
+import altn72.prj.modele.Evaluation;
 import altn72.prj.modele.Incident;
 
 import altn72.prj.modele.IncidentStatut;
 import altn72.prj.modele.Prestataire;
 import altn72.prj.repository.EquipementRepository;
+import altn72.prj.repository.EvaluationRepository;
 import altn72.prj.repository.IncidentRepository;
 import altn72.prj.repository.PrestataireRepository;
 import altn72.prj.repository.UtilisateurRepository;
@@ -27,12 +29,14 @@ public class IncidentService {
     private final EquipementRepository equipmentRepository;
     private final UtilisateurRepository userRepository;
     private final PrestataireRepository prestaRepository;
+    private final EvaluationRepository evalRepo;
 
-    public IncidentService(IncidentRepository incidentRepository, EquipementRepository equipmentRepository, UtilisateurRepository userRepository, PrestataireRepository prestaRepository){
+    public IncidentService(IncidentRepository incidentRepository, EquipementRepository equipmentRepository, UtilisateurRepository userRepository, PrestataireRepository prestaRepository, EvaluationRepository evalRepo){
         this.incidentRepository = incidentRepository;
         this.equipmentRepository = equipmentRepository;
         this.userRepository = userRepository;
         this.prestaRepository = prestaRepository;
+        this.evalRepo = evalRepo;
     }
 
     public Optional<Incident> getIncident(Integer idIncident) {
@@ -116,6 +120,27 @@ public class IncidentService {
             i.setStatut(IncidentStatut.RESOLU);
             i.setDateResolution(LocalDateTime.now());
             return i;
+        });
+    }
+
+    @Transactional
+    public Optional<Incident> evaluateIncident(Integer idIncident, IncidentController.EvaluationRequest dataForm, String auth) {
+        return incidentRepository.findById(idIncident).map(incident -> {
+            if (incident.getStatut() != IncidentStatut.RESOLU) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Impossible d'évaluer un incident non résolu");
+            }
+            if (incident.getEvaluation() != null) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Incident déjà évalué");
+            }
+            Evaluation evaluation = new Evaluation();
+            evaluation.setIncident(incident);
+            evaluation.setNote(dataForm.note());
+            evaluation.setCommentaire(dataForm.commentaire());
+            evaluation.setDateEvaluation(LocalDateTime.now());
+            userRepository.findByLogin(auth).ifPresent(evaluation::setEvaluePar);
+            evalRepo.save(evaluation);
+            incident.setEvaluation(evaluation);
+            return incident;
         });
     }
 }

@@ -72,7 +72,15 @@ public class IncidentController {
         return incidentService.getHistorique().isEmpty() ? ResponseEntity.ok(incidentService.getHistorique()) : ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/{idIncident}/evaluation")
+    public ResponseEntity<Incident> evaluateIncident(@PathVariable Integer idIncident, @RequestBody EvaluationRequest requete, Authentication authentication) {
+        return incidentService.evaluateIncident(idIncident, requete, authentication.getName())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     public record CreationIncidentRequest(Integer equipementId, String titre, String description, IncidentPriorite priorite) {}
     public record AffectationRequest(Integer prestataireId) {}
+    public record EvaluationRequest(Integer note, String commentaire) {}
 
 }
