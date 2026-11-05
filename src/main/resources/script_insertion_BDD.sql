@@ -61,7 +61,9 @@ INSERT INTO incident (equipement_id, titre, description, priorite, statut, date_
 (8, 'Écran tactile HS',          'Écran tactile du distributeur non réactif.', 'BASSE',   'RESOLU', NOW() - INTERVAL 30 DAY, 3, NOW() - INTERVAL 30 DAY + INTERVAL 3 HOUR, NOW() - INTERVAL 27 DAY, 'Remplacement de la dalle.',  3),
 (6, 'Affichage erroné',          'Horaires affichés incorrects.',              'BASSE',   'RESOLU',  NOW() - INTERVAL 5 DAY,  4, NOW() - INTERVAL 5 DAY + INTERVAL 1 HOUR,  NOW() - INTERVAL 4 DAY,  'Mise à jour du logiciel.',   2),
 (9, 'Portique en alarme',        'Alarme sonore intempestive.',                'NORMALE', 'RESOLU', NOW() - INTERVAL 40 DAY, 2, NOW() - INTERVAL 40 DAY + INTERVAL 1 HOUR, NOW() - INTERVAL 39 DAY, 'Recalibrage du capteur.',   3),
-(2, 'Escalator à l''arrêt',      'Arrêt d''urgence déclenché.',                'HAUTE',   'RESOLU', NOW() - INTERVAL 25 DAY, 5, NOW() - INTERVAL 25 DAY + INTERVAL 2 HOUR, NOW() - INTERVAL 24 DAY, 'Remise en route après contrôle.', 2);
+(2, 'Escalator à l''arrêt',      'Arrêt d''urgence déclenché.',                'HAUTE',   'RESOLU', NOW() - INTERVAL 25 DAY, 5, NOW() - INTERVAL 25 DAY + INTERVAL 2 HOUR, NOW() - INTERVAL 24 DAY, 'Remise en route après contrôle.', 2)
+(2, 'Bruit anormal en fonctionnement', 'Grincement inhabituel au niveau des marches pendant le fonctionnement.', 'NORMALE', 'RESOLU', NOW() - INTERVAL 12 DAY, 5, NOW() - INTERVAL 12 DAY + INTERVAL 2 HOUR, NOW() - INTERVAL 11 DAY, 'Lubrification et réglage du mécanisme.', 3),
+(2, 'Marche d''escalator endommagée', 'Une marche présente un défaut d''alignement et provoque des vibrations.', 'HAUTE', 'RESOLU', NOW() - INTERVAL 8 DAY, 5, NOW() - INTERVAL 8 DAY + INTERVAL 1 HOUR, NOW() - INTERVAL 7 DAY, 'Remplacement de la marche et contrôle du système.', 2);
 
 -- Évaluations (ids 1 à 6, rattachées ensuite aux incidents résolus)
 INSERT INTO evaluation(incident_id, note, commentaire, date_evaluation, evalue_par)VALUES
