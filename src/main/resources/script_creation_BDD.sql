@@ -1,9 +1,14 @@
 
-DROP DATABASE IF EXISTS gestion_transport;
-CREATE DATABASE gestion_transport
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
-USE gestion_transport;
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS station;
+DROP TABLE IF EXISTS type_equipement;
+DROP TABLE IF EXISTS prestataire;
+DROP TABLE IF EXISTS utilisateur;
+DROP TABLE IF EXISTS equipement;
+DROP TABLE IF EXISTS incident;
+DROP TABLE IF EXISTS evaluation;
+
+SET FOREIGN_KEY_CHECKS = 1;
 
 -- ---------------------------------------------------------------------
 -- STATION
