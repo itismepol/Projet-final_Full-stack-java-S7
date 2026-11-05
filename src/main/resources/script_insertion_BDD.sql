@@ -48,11 +48,46 @@ INSERT INTO utilisateur (login, mot_de_passe, prenom, nom, email, profil) VALUES
 
 -- Incidents
 -- Ouverts / en cours (date_resolution NULL)
-INSERT INTO incident (equipement_id, titre, description, priorite, statut, date_ouverture, prestataire_id, date_affectation, commentaire_resolution, date_resolution, declare_par) VALUES
-(1,  'Ascenseur bloqué',        'Ascenseur quai A bloqué entre deux niveaux.',        'CRITIQUE', 'AFFECTE', NOW() - INTERVAL 2 DAY,   1, NOW() - INTERVAL 46 HOUR, NULL, NULL, 3),
-(4,  'Distributeur lent',       'Le distributeur n''imprime plus les tickets.',       'NORMALE',  'AFFECTE',  NOW() - INTERVAL 47 HOUR, 3, NOW() - INTERVAL 20 HOUR, NULL, NULL, 3),
-(11, 'Écran éteint',            'Écran du hall central totalement éteint.',           'HAUTE',    'OUVERT',   NOW() - INTERVAL 6 HOUR,  NULL, NULL, NULL, NULL, 2),
-(7,  'Bruit anormal escalator', 'Bruit métallique au démarrage de l''escalator.',     'NORMALE',  'AFFECTE', NOW() - INTERVAL 3 DAY,   1, NOW() - INTERVAL 70 HOUR,NULL, NULL, 3);
+INSERT INTO incident (
+    equipement_id, titre, description, priorite, statut,
+    date_ouverture, prestataire_id, date_affectation,
+    commentaire_resolution, date_resolution, declare_par
+) VALUES
+(1, 'Ascenseur bloqué',
+ 'Ascenseur quai A bloqué entre deux niveaux.',
+ 'CRITIQUE', 'AFFECTE',
+ NOW() - INTERVAL 2 DAY, 1, NOW() - INTERVAL 46 HOUR,
+ NULL, NULL, 3),
+
+(4, 'Distributeur lent',
+ 'Le distributeur n''imprime plus les tickets.',
+ 'NORMALE', 'AFFECTE',
+ NOW() - INTERVAL 47 HOUR, 3, NOW() - INTERVAL 20 HOUR,
+ NULL, NULL, 3),
+
+(11, 'Écran éteint',
+ 'Écran du hall central totalement éteint.',
+ 'HAUTE', 'OUVERT',
+ NOW() - INTERVAL 6 HOUR, NULL, NULL,
+ NULL, NULL, 2),
+
+(7, 'Bruit anormal escalator',
+ 'Bruit métallique au démarrage de l''escalator.',
+ 'NORMALE', 'AFFECTE',
+ NOW() - INTERVAL 3 DAY, 1, NOW() - INTERVAL 70 HOUR,
+ NULL, NULL, 3),
+
+(7, 'Arrêt intempestif escalator',
+ 'L''escalator s''arrête brusquement après quelques minutes de fonctionnement.',
+ 'HAUTE', 'AFFECTE',
+ NOW() - INTERVAL 18 HOUR, 1, NOW() - INTERVAL 16 HOUR,
+ NULL, NULL, 2),
+
+(7, 'Capteur de sécurité défaillant',
+ 'Le capteur de détection de présence déclenche des arrêts injustifiés de l''escalator.',
+ 'CRITIQUE', 'OUVERT',
+ NOW() - INTERVAL 4 HOUR, NULL, NULL,
+ NULL, NULL, 3);
 
 -- Résolus
 INSERT INTO incident (equipement_id, titre, description, priorite, statut, date_ouverture, prestataire_id, date_affectation, date_resolution, commentaire_resolution, declare_par) VALUES
@@ -61,7 +96,7 @@ INSERT INTO incident (equipement_id, titre, description, priorite, statut, date_
 (8, 'Écran tactile HS',          'Écran tactile du distributeur non réactif.', 'BASSE',   'RESOLU', NOW() - INTERVAL 30 DAY, 3, NOW() - INTERVAL 30 DAY + INTERVAL 3 HOUR, NOW() - INTERVAL 27 DAY, 'Remplacement de la dalle.',  3),
 (6, 'Affichage erroné',          'Horaires affichés incorrects.',              'BASSE',   'RESOLU',  NOW() - INTERVAL 5 DAY,  4, NOW() - INTERVAL 5 DAY + INTERVAL 1 HOUR,  NOW() - INTERVAL 4 DAY,  'Mise à jour du logiciel.',   2),
 (9, 'Portique en alarme',        'Alarme sonore intempestive.',                'NORMALE', 'RESOLU', NOW() - INTERVAL 40 DAY, 2, NOW() - INTERVAL 40 DAY + INTERVAL 1 HOUR, NOW() - INTERVAL 39 DAY, 'Recalibrage du capteur.',   3),
-(2, 'Escalator à l''arrêt',      'Arrêt d''urgence déclenché.',                'HAUTE',   'RESOLU', NOW() - INTERVAL 25 DAY, 5, NOW() - INTERVAL 25 DAY + INTERVAL 2 HOUR, NOW() - INTERVAL 24 DAY, 'Remise en route après contrôle.', 2)
+(2, 'Escalator à l''arrêt',      'Arrêt d''urgence déclenché.',                'HAUTE',   'RESOLU', NOW() - INTERVAL 25 DAY, 5, NOW() - INTERVAL 25 DAY + INTERVAL 2 HOUR, NOW() - INTERVAL 24 DAY, 'Remise en route après contrôle.', 2),
 (2, 'Bruit anormal en fonctionnement', 'Grincement inhabituel au niveau des marches pendant le fonctionnement.', 'NORMALE', 'RESOLU', NOW() - INTERVAL 12 DAY, 5, NOW() - INTERVAL 12 DAY + INTERVAL 2 HOUR, NOW() - INTERVAL 11 DAY, 'Lubrification et réglage du mécanisme.', 3),
 (2, 'Marche d''escalator endommagée', 'Une marche présente un défaut d''alignement et provoque des vibrations.', 'HAUTE', 'RESOLU', NOW() - INTERVAL 8 DAY, 5, NOW() - INTERVAL 8 DAY + INTERVAL 1 HOUR, NOW() - INTERVAL 7 DAY, 'Remplacement de la marche et contrôle du système.', 2);
 
