@@ -3,6 +3,7 @@ package altn72.prj.modele;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "equipement")
@@ -35,6 +36,9 @@ public class Equipement {
 
     @Column(name = "date_mise_service")
     private LocalDate dateMiseService;
+
+    @Transient
+    private boolean fragile;
 
     public Integer getId() {
         return id;
@@ -100,4 +104,11 @@ public class Equipement {
         this.dateMiseService = dateMiseService;
     }
 
+    public boolean isFragile() {
+        return fragile;
+    }
+
+    public void setFragile(boolean fragile) {
+        this.fragile = fragile;
+    }
 }

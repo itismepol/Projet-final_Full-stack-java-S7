@@ -15,16 +15,20 @@ public class ConsultationEquipementService {
 
     private final EquipementRepository equipementRepository;
     private final StationRepository stationRepository;
+    private final EquipementFragileService equipementFragileService;
 
-
-    public ConsultationEquipementService(EquipementRepository equipementRepository, StationRepository stationRepository) {
+    public ConsultationEquipementService(EquipementRepository equipementRepository, StationRepository stationRepository, EquipementFragileService equipementFragileService) {
         this.equipementRepository = equipementRepository;
         this.stationRepository = stationRepository;
+        this.equipementFragileService = equipementFragileService;
     }
 
     public Equipement getEquipement(Integer idEquipement) {
-        return equipementRepository.findById(idEquipement)
+        Equipement equipement = equipementRepository.findById(idEquipement)
                 .orElseThrow(() -> new RessourceIntrouvableException("Équipement", idEquipement));
+
+        equipement.setFragile(equipementFragileService.estFragile(equipement.getId()));
+        return equipement;
     }
 
     public List<Equipement> listerEquipementsStation(Integer idStation) {

@@ -14,6 +14,7 @@ public record DashboardIncidentDto(
         Integer equipementId,
         String equipementReference,
         String equipementLibelle,
+        boolean equipementFragile,
         String typeEquipement,
         Integer stationId,
         String stationNom,

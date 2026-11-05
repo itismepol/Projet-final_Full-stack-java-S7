@@ -29,9 +29,12 @@ class IncidentServiceTest {
     private IncidentRepository incidentRepository;
     @Mock private StationRepository stationRepository;
     @Mock private EquipementRepository equipmentRepository;
-    @Mock private UtilisateurRepository userRepository;
     @Mock private PrestataireRepository prestaRepository;
     @Mock private EvaluationRepository evalRepo;
+    @Mock
+    private UtilisateurRepository utilisateurRepository;
+    @Mock
+    private EquipementFragileService equipementFragileService;
 
     @InjectMocks
     private IncidentService service;
@@ -73,16 +76,50 @@ class IncidentServiceTest {
 
     @Test
     void incidentDeclareDemarreOuvertSansPrestataire() {
-        when(equipmentRepository.findById(10)).thenReturn(Optional.of(FabriqueDonnees.equipement()));
-        when(incidentRepository.save(any(Incident.class))).thenAnswer(appel -> appel.getArgument(0));
+        Equipement equipement = FabriqueDonnees.equipement();
+
+        when(utilisateurRepository.findByLogin("tech1"))
+                .thenReturn(Optional.of(FabriqueDonnees.utilisateur("tech1")));
+        when(equipmentRepository.findById(10)).thenReturn(Optional.of(equipement));
+        when(incidentRepository.save(any(Incident.class)))
+                .thenAnswer(appel -> appel.getArgument(0));
+        when(equipementFragileService.estFragile(10)).thenReturn(false);
+
         LocalDateTime avant = LocalDateTime.now();
 
-        Incident incident = service.creerIncident(new CreationIncidentRequest(10, "Panne", "Bloqué", null), "tech1");
+        Incident incident = service.creerIncident(
+                new CreationIncidentRequest(10, "Panne", "Bloqué", null),
+                "tech1"
+        );
 
         assertEquals(IncidentStatut.OUVERT, incident.getStatut());
         assertNull(incident.getPrestataire());
         assertEquals(IncidentPriorite.NORMALE, incident.getPriorite());
         assertFalse(incident.getDateOuverture().isBefore(avant));
+
+        assertFalse(incident.getEquipement().isFragile());
+
+        verify(equipementFragileService).estFragile(10);
+    }
+
+    @Test
+    void declarationIncidentMetAJourLaFragiliteDeLEquipement() {
+        Equipement equipement = FabriqueDonnees.equipement();
+
+        when(utilisateurRepository.findByLogin("tech1"))
+                .thenReturn(Optional.of(FabriqueDonnees.utilisateur("tech1")));
+        when(equipmentRepository.findById(10)).thenReturn(Optional.of(equipement));
+        when(incidentRepository.save(any(Incident.class)))
+                .thenAnswer(appel -> appel.getArgument(0));
+        when(equipementFragileService.estFragile(10)).thenReturn(true);
+
+        Incident incident = service.creerIncident(
+                new CreationIncidentRequest(10, "Panne", "Bloqué", null),
+                "tech1"
+        );
+
+        assertTrue(incident.getEquipement().isFragile());
+        verify(equipementFragileService).estFragile(10);
     }
 
     @Test
@@ -196,6 +233,8 @@ class IncidentServiceTest {
     @Test
     void evaluerUnIncidentResoluEnregistreLaNote() {
         Incident incident = FabriqueDonnees.incident(1, IncidentStatut.RESOLU, 50);
+        when(utilisateurRepository.findByLogin("resp.expl"))
+                .thenReturn(Optional.of(FabriqueDonnees.utilisateur("resp.expl")));
         when(incidentRepository.findById(1)).thenReturn(Optional.of(incident));
 
         service.evaluateIncident(1, new EvaluationRequest(4, "Bien"), "resp.expl");

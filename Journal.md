@@ -7,7 +7,7 @@
 - Prérequis : Java 27, Maven 3.9.16, base MySQL Server, projet front : Node.js 20.19, React 19, TypeScript 6 et Vite 8
 - Initialiser la base : `src\main\resources\script_creation_BDD.sql.` (création de la base) et `src\main\resources\script_insertion_BDD.sql` (insérer les données)
 - Lancer : Projet (Projet-final-Java-Fullstack) : `mvn spring-boot:run` , Projet (projet-fullstack-web-frontend-S7) : `npm run dev`
-- Application déployée : https://projet-final-full-stack-java-s7.onrender.com
+- Application déployée : https://projet-fullstack-web-frontend-s7.onrender.com/
 - Comptes de test : profil 1 : "agent1" / "password" ; profil 2 : "resp.expl1" / "password"
 - Limites connues : Aucune limitation connue
 
@@ -17,7 +17,7 @@
   - url du dépot backend : https://github.com/itismepol/Projet-final_Full-stack-java-S7.git
   - url du dépot frontend : https://github.com/DrDriia/projet-fullstack-web-frontend-S7.git
 
-- Schéma : ![architecture](src\main\resources\Architecture-ProjetFinal-Java-Fullstack.png)
+- Schéma : ![architecture](src/main/resources/Architecture-ProjetFinal-Java-Fullstack.png)
 
 ## TESTS
 
@@ -111,9 +111,7 @@
   @Query("SELECT i FROM Incident i WHERE i.statut = altn72.prj.modele.IncidentStatut.RESOLU AND i.equipement.station.id = :idStation ORDER BY i.dateResolution DESC")
   @Query("SELECT i FROM Incident i WHERE i.statut = altn72.prj.modele.IncidentStatut.RESOLU AND i.equipement.id = :idEquipment ORDER BY i.dateResolution DESC")
   @Query("SELECT i FROM Incident i WHERE i.statut <> altn72.prj.modele.IncidentStatut.RESOLU AND i.equipement.id = :idEquipment ORDER BY i.dateOuverture")
-  @Query("SELECT i FROM Incident i WHERE i.prestataire.id = :idPrestataire "
-      + "AND EXISTS (SELECT e FROM Evaluation e WHERE e.incident = i) "
-      + "ORDER BY i.dateResolution DESC")
+  @Query("SELECT i FROM Incident i WHERE i.prestataire.id = :idPrestataire " + "AND EXISTS (SELECT e FROM Evaluation e WHERE e.incident = i) "+ "ORDER BY i.dateResolution DESC")
   ```
 
 - @Transactional :
@@ -168,3 +166,57 @@
   2. **La gestion des règles métier et des fonctionnalités :** nous avons appris à traduire des besoins fonctionnels en fonctionnalités concrètes, notamment la gestion des incidents, leur affectation, le suivi de leur urgence et la création d'un tableau de bord.
 
   3. **Le travail en équipe et l'intégration :** nous avons appris à répartir le travail, à faire communiquer deux parties développées séparément et à résoudre ensemble les problèmes rencontrés lors de leur intégration. Cette collaboration nous a permis de participer à l'ensemble du projet.
+
+## Évolution séance finale
+
+### Description de l'évolution réalisée
+
+Nous avons ajouté une fonctionnalité permettant d'identifier les équipements fragiles, c'est-à-dire les équipements ayant enregistré au moins trois incidents au cours des trente derniers jours.
+
+Cette évolution concerne principalement les fichiers suivants :
+
+**Backend :**
+
+- `IncidentRepository.java` : ajout d'une méthode permettant de compter les incidents d'un équipement à partir d'une date donnée.
+- `EquipementFragileService.java` : création d'un service chargé de calculer si un équipement est fragile.
+- `Equipement.java` : ajout d'une propriété calculée `fragile`, non persistée en base de données.
+- `ConsultationEquipementService.java` : calcul de la fragilité lors de la consultation d'un équipement.
+- `DashboardIncidentDto.java` et `DashboardService.java` : ajout de l'information de fragilité dans les données du tableau de bord.
+- `IncidentService.java` : recalcul de la fragilité après la déclaration d'un incident.
+
+**Frontend :**
+
+- `src/utils/types/equipement.ts` et `src/utils/types/dashboard.ts` : ajout des propriétés nécessaires dans les types TypeScript.
+- `src/components/pages/EquipementDetailsPage.tsx` : affichage du badge « Équipement fragile » sur la fiche équipement.
+- `src/components/pages/DashboardPage.tsx` : affichage du badge sur les incidents actifs associés à un équipement fragile.
+- `src/components/forms/IncidentForm.tsx` : adaptation du message de confirmation après la déclaration d'un incident.
+
+### Choix de conception et raccourcis éventuels
+
+Nous avons choisi de ne pas enregistrer le caractère fragile dans la base de données. Il est calculé à chaque consultation à partir des dates d'ouverture des incidents associés à l'équipement.
+
+La règle métier est placée dans un service dédié, `EquipementFragileService`, afin de respecter la séparation des responsabilités entre les repositories, les services et les contrôleurs.
+
+Le seuil de trois incidents et la période de trente jours sont regroupés sous forme de constantes dans ce service. Cela évite de disperser ces valeurs dans plusieurs parties du code.
+
+Le comptage prend en compte tous les incidents, quel que soit leur statut. La date limite est incluse dans le calcul : un incident ouvert exactement trente jours auparavant est donc comptabilisé.
+
+Nous avons utilisé une méthode de comptage Spring Data JPA plutôt que de récupérer tous les incidents pour effectuer le calcul en Java. Cela permet de confier le comptage à la base de données.
+
+### Tests ajoutés et limites connues
+
+Nous avons ajouté des tests unitaires avec JUnit 5 et Mockito pour vérifier :
+
+- Qu'un équipement ayant deux incidents récents n'est pas considéré comme fragile.
+- Qu'un équipement ayant trois incidents récents est considéré comme fragile.
+- Que le seuil reste atteint lorsque le nombre d'incidents dépasse trois.
+- Que le calcul utilise une période de trente jours.
+- Que le calcul concerne bien l'équipement demandé et ne mélange pas les incidents de plusieurs équipements.
+
+Nous avons également adapté les tests existants pour prendre en compte la nouvelle dépendance au service de fragilité.
+
+Les tests unitaires utilisent des repositories simulés avec Mockito. Ils ne vérifient donc pas directement le comportement de la requête dérivée Spring Data JPA sur une véritable base de données.
+
+Une limite supplémentaire concerne les tests des frontières temporelles : l'utilisation directe de `LocalDateTime.now()` rend les tests dépendants de l'heure réelle. L'injection d'un `Clock` permettrait de mieux maîtriser ces cas limites.
+
+Enfin, des tests d'intégration supplémentaires permettraient de vérifier le comptage réel des incidents, notamment la prise en compte des incidents résolus et l'exclusion des incidents ouverts avant la période de trente jours. Des tests frontend permettraient également de vérifier automatiquement l'affichage des badges et du message de confirmation.

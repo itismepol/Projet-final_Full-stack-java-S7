@@ -17,10 +17,12 @@ public class DashboardService {
 
     private final IncidentRepository incidentRepository;
     private final IndicateurUrgenceService indicateurUrgenceService;
+    private final EquipementFragileService equipementFragileService;
 
-    public DashboardService(IncidentRepository incidentRepository, IndicateurUrgenceService indicateurUrgenceService) {
+    public DashboardService(IncidentRepository incidentRepository, IndicateurUrgenceService indicateurUrgenceService, EquipementFragileService equipementFragileService) {
         this.incidentRepository = incidentRepository;
         this.indicateurUrgenceService = indicateurUrgenceService;
+        this.equipementFragileService = equipementFragileService;
     }
 
     public DashboardDto obtenirTableauDeBord() {
@@ -75,6 +77,7 @@ public class DashboardService {
                 equipement.getId(),
                 equipement.getReference(),
                 equipement.getLibelle(),
+                equipementFragileService.estFragile(equipement.getId()),
                 equipement.getType().getLibelle(),
                 station.getId(),
                 station.getNom(),
