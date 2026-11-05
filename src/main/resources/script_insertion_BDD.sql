@@ -1,5 +1,3 @@
-USE gestion_transport;
-
 -- Stations
 INSERT INTO station (nom, adresse, ville) VALUES
 ('Gare Centrale',   '1 place de la Gare',        'Paris'),
