@@ -51,4 +51,10 @@ public final class FabriqueDonnees {
     public static Incident incident(int id, IncidentStatut statut, long heuresDepuisOuverture) {
         return incident(id, statut, IncidentPriorite.NORMALE, heuresDepuisOuverture, null);
     }
+
+    public static Utilisateur utilisateur(String login) {
+        Utilisateur utilisateur = new Utilisateur();
+        utilisateur.setLogin(login);
+        return utilisateur;
+    }
 }

@@ -18,8 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -31,12 +30,14 @@ class DashboardServiceTest {
 
     @Mock
     private IncidentRepository incidentRepository;
+    @Mock
+    private EquipementFragileService equipementFragileService;
 
     private DashboardService service;
 
     @BeforeEach
     void initialiser() {
-        service = new DashboardService(incidentRepository, new IndicateurUrgenceService());
+        service = new DashboardService(incidentRepository, new IndicateurUrgenceService(), equipementFragileService);
     }
 
     @Test
@@ -103,5 +104,48 @@ class DashboardServiceTest {
                 FabriqueDonnees.incident(3, IncidentStatut.OUVERT, IncidentPriorite.HAUTE, 80, null),
                 FabriqueDonnees.incident(4, IncidentStatut.AFFECTE, IncidentPriorite.CRITIQUE, 100,
                         FabriqueDonnees.prestataire(3, true)));
+    }
+
+    @Test
+    void incidentAssocieAUnEquipementFragileExposeLaFragilite() {
+        when(incidentRepository.findByStatutInOrderByDateOuvertureAsc(STATUTS_ACTIFS))
+                .thenReturn(List.of(
+                        FabriqueDonnees.incident(
+                                1,
+                                IncidentStatut.OUVERT,
+                                IncidentPriorite.CRITIQUE,
+                                5,
+                                null
+                        )
+                ));
+
+        when(equipementFragileService.estFragile(10)).thenReturn(true);
+
+        DashboardIncidentDto incident =
+                service.obtenirTableauDeBord().incidents().getFirst();
+
+        assertTrue(incident.equipementFragile());
+        verify(equipementFragileService).estFragile(10);
+    }
+
+    @Test
+    void incidentAssocieAUnEquipementNonFragileExposeUneFragiliteFalse() {
+        when(incidentRepository.findByStatutInOrderByDateOuvertureAsc(STATUTS_ACTIFS))
+                .thenReturn(List.of(
+                        FabriqueDonnees.incident(
+                                1,
+                                IncidentStatut.OUVERT,
+                                IncidentPriorite.CRITIQUE,
+                                5,
+                                null
+                        )
+                ));
+
+        when(equipementFragileService.estFragile(10)).thenReturn(false);
+
+        DashboardIncidentDto incident =
+                service.obtenirTableauDeBord().incidents().getFirst();
+
+        assertFalse(incident.equipementFragile());
     }
 }

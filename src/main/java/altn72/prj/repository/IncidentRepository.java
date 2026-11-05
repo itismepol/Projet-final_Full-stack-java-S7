@@ -2,6 +2,7 @@ package altn72.prj.repository;
 
 import altn72.prj.modele.Incident;
 import altn72.prj.modele.IncidentStatut;
+import java.time.LocalDateTime;
 
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,4 +30,6 @@ public interface IncidentRepository extends JpaRepository<Incident, Integer> {
 
     @EntityGraph(attributePaths = {"equipement", "equipement.station", "equipement.type", "prestataire"})
     List<Incident> findByStatutInOrderByDateOuvertureAsc(List<IncidentStatut> statuts);
+
+    long countByEquipementIdAndDateOuvertureGreaterThanEqual(Integer equipementId, LocalDateTime dateLimite);
 }

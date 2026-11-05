@@ -20,17 +20,19 @@ public class IncidentService {
     private final IncidentRepository incidentRepository;
     private final StationRepository stationRepository;
     private final EquipementRepository equipmentRepository;
-    private final UtilisateurRepository userRepository;
+    private final UtilisateurRepository utilisateurRepository;
     private final PrestataireRepository prestaRepository;
     private final EvaluationRepository evalRepo;
+    private final EquipementFragileService equipementFragileService;
 
-    public IncidentService(IncidentRepository incidentRepository, StationRepository stationRepository, EquipementRepository equipmentRepository, UtilisateurRepository userRepository, PrestataireRepository prestaRepository, EvaluationRepository evalRepo){
+    public IncidentService(IncidentRepository incidentRepository, StationRepository stationRepository, EquipementRepository equipmentRepository, UtilisateurRepository utilisateurRepository, PrestataireRepository prestaRepository, EvaluationRepository evalRepo, EquipementFragileService equipementFragileService){
         this.incidentRepository = incidentRepository;
         this.stationRepository = stationRepository;
         this.equipmentRepository = equipmentRepository;
-        this.userRepository = userRepository;
+        this.utilisateurRepository = utilisateurRepository;
         this.prestaRepository = prestaRepository;
         this.evalRepo = evalRepo;
+        this.equipementFragileService = equipementFragileService;
     }
 
     public Incident getIncident(Integer idIncident) {
@@ -76,8 +78,11 @@ public class IncidentService {
         if (dataForm.priorite() != null) incident.setPriorite(dataForm.priorite());
         incident.setStatut(IncidentStatut.OUVERT);
         incident.setDateOuverture(LocalDateTime.now());
-        userRepository.findByLogin(login).ifPresent(incident::setDeclarePar);
-        return incidentRepository.save(incident);
+        utilisateurRepository.findByLogin(login).ifPresent(incident::setDeclarePar);
+        Incident incidentEnregistre = incidentRepository.save(incident);
+        equipement.setFragile(equipementFragileService.estFragile(equipement.getId()));
+
+        return incidentEnregistre;
     }
 
     @Transactional
@@ -138,7 +143,7 @@ public class IncidentService {
         evaluation.setNote(dataForm.note());
         evaluation.setCommentaire(dataForm.commentaire());
         evaluation.setDateEvaluation(LocalDateTime.now());
-        userRepository.findByLogin(login).ifPresent(evaluation::setEvaluePar);
+        utilisateurRepository.findByLogin(login).ifPresent(evaluation::setEvaluePar);
         evalRepo.save(evaluation);
         incident.setEvaluation(evaluation);
         return incident;
