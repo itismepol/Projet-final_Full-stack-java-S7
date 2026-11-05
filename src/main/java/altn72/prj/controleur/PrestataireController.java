@@ -3,6 +3,7 @@ package altn72.prj.controleur;
 import altn72.prj.modele.Incident;
 import altn72.prj.modele.Prestataire;
 import altn72.prj.service.PrestataireService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class PrestataireController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Prestataire createPrestataire(@RequestBody Prestataire prestataire) {
+    public Prestataire createPrestataire(@Valid @RequestBody Prestataire prestataire) {
         return prestataireService.ajouterPrestataire(prestataire);
     }
 

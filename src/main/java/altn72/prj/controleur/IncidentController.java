@@ -36,12 +36,6 @@ public class IncidentController {
         return incidentService.getHistorique();
     }
 
-    @PreAuthorize("hasRole('RESPONSABLE_EXPLOITATION')")
-    @DeleteMapping("/{idIncident}")
-    public void deleteIncident(@PathVariable("idIncident") Integer idIncident) {
-        incidentService.supprimerIncident(idIncident);
-    }
-
     @PostMapping
     public ResponseEntity<Incident> creerIncident(@Valid @RequestBody CreationIncidentRequest dataForm,
                                                   Authentication auth) {
@@ -52,12 +46,6 @@ public class IncidentController {
     }
 
     @PreAuthorize("hasRole('RESPONSABLE_EXPLOITATION')")
-    @PutMapping("/{idIncident}")
-    public Incident modifierIncident(@PathVariable Integer idIncident, @ModelAttribute Incident incidentModifie) {
-        return incidentService.modifierIncident(idIncident, incidentModifie);
-    }
-
-    @PreAuthorize("hasRole('RESPONSABLE_EXPLOITATION')")
     @PutMapping("/{idIncident}/resolve")
     public Incident resoudreIncident(@PathVariable Integer idIncident) {
         return incidentService.resolveIncident(idIncident);
@@ -65,13 +53,8 @@ public class IncidentController {
 
     @PreAuthorize("hasRole('RESPONSABLE_EXPLOITATION')")
     @PutMapping("/{idIncident}/prestataire")
-    public Incident affecterPrestataire(@PathVariable Integer idIncident, @RequestBody AffectationRequest requete) {
+    public Incident affecterPrestataire(@PathVariable Integer idIncident, @Valid @RequestBody AffectationRequest requete) {
         return incidentService.affectPresta(idIncident, requete.prestataireId());
-    }
-
-    @GetMapping("Historique/Incident")
-    public List<Incident> listerIncidents() {
-        return incidentService.getHistorique();
     }
 
     @PreAuthorize("hasRole('RESPONSABLE_EXPLOITATION')")
